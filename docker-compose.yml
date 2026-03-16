@@ -1,0 +1,27 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    volumes:
+      - ./backend:/backend
+    ports:
+      - "2307:2307"
+    command: python manage.py runserver 0.0.0.0:2307 --noreload
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "2002:2002"
+    volumes:
+      - ./frontend:/frontend
+      - /frontend/node_modules
+    stdin_open: true
+    tty: true
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "2002"]
+    env_file:
+      - ./frontend/.env
