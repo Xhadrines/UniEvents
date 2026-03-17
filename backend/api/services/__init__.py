@@ -4,6 +4,7 @@ from .facultate import FacultateService
 from .specializare import SpecializareService
 from .rol import RolService
 from .stare import StareService
+from .user import UserService
 from .user_profiles import UserProfilesService
 from .tip import TipService
 from .organizator import OrganizatorService

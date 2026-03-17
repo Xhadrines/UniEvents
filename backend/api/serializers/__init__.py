@@ -2,6 +2,7 @@ from .facultate import FacultateSerializer
 from .specializare import SpecializareSerializer
 from .rol import RolSerializer
 from .stare import StareSerializer
+from .user import UserSerializer
 from .user_profiles import UserProfilesSerializer
 from .tip import TipSerializer
 from .organizator import OrganizatorSerializer

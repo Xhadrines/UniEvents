@@ -12,6 +12,7 @@ class HomeView(TemplateView):
             ("Specializare", "/api/specializare/"),
             ("Rol", "/api/rol/"),
             ("Stare", "/api/stare/"),
+            ("User", "/api/user/"),
             ("User Profiles", "/api/user_profiles/"),
             ("Tip", "/api/tip/"),
             ("Organizator", "/api/organizator/"),

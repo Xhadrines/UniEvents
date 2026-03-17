@@ -6,6 +6,7 @@ from .views import (
     SpecializareView,
     RolView,
     StareView,
+    UserView,
     UserProfilesView,
     TipView,
     OrganizatorView,
@@ -31,6 +32,8 @@ urlpatterns = [
     path("rol/<int:pk>/", RolView.as_view(), name="rol-detail"),
     path("stare/", StareView.as_view(), name="stare"),
     path("stare/<int:pk>/", StareView.as_view(), name="stare-detail"),
+    path("user/", UserView.as_view(), name="user"),
+    path("user/<int:pk>/", UserView.as_view(), name="user-detail"),
     path("user_profiles/", UserProfilesView.as_view(), name="user_profiles"),
     path(
         "user_profiles/<int:pk>/",

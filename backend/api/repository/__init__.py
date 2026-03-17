@@ -4,6 +4,7 @@ from .facultate import FacultateRepository
 from .specializare import SpecializareRepository
 from .rol import RolRepository
 from .stare import StareRepository
+from .user import UserRepository
 from .user_profiles import UserProfilesRepository
 from .tip import TipRepository
 from .organizator import OrganizatorRepository

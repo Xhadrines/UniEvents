@@ -4,7 +4,6 @@ from rest_framework import status
 
 
 class BaseCRUDView(APIView):
-
     service = None
     serializer_class = None
 

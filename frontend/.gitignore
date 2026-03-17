@@ -8,6 +8,7 @@ __pycache__/*
 db.sqlite3
 pdfs/*
 docs/*
+**/migrations/*_initial.py
 
 # Frontend
 node_modules/*

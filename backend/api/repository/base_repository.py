@@ -47,3 +47,23 @@ class BaseRepository:
 
         obj.delete()
         return True
+
+    def get_instance_by_name(self, name):
+        return self.model.objects.filter(nume=name).first()
+
+    def get_id_by_name(self, name):
+        obj = self.model.objects.filter(nume=name).only("id").first()
+        return obj.id if obj else None
+
+    def get_all_by_name(self, name):
+        return self.model.objects.filter(nume=name)
+
+    def get_instance_by_username(self, username):
+        return self.model.objects.filter(username=username).first()
+
+    def get_id_by_username(self, username):
+        obj = self.model.objects.filter(username=username).only("id").first()
+        return obj.id if obj else None
+
+    def get_all_by_username(self, username):
+        return self.model.objects.filter(username=username)

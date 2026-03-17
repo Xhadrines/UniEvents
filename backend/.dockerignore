@@ -9,6 +9,7 @@ db.sqlite3
 pdfs/*
 docs/*
 media/*
+**/migrations/*_initial.py
 
 # Frontend
 node_modules/*
