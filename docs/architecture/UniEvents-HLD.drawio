@@ -1,0 +1,133 @@
+<mxfile host="65bd71144e">
+    <diagram id="68PajU4Cw9pd9BYNL7Ik" name="Page-1">
+        <mxGraphModel dx="1824" dy="1303" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="Utilizator" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="520" width="40" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Frontend" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="200" y="440" width="240" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="&lt;code data-end=&quot;342&quot; data-start=&quot;318&quot;&gt;Autentificare&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="3">
+                    <mxGeometry x="40" y="80" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="" style="shape=flexArrow;endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="100" y="560" as="sourcePoint"/>
+                        <mxPoint x="180" y="559.8299999999999" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="6" value="" style="shape=flexArrow;endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="460" y="559.97" as="sourcePoint"/>
+                        <mxPoint x="540" y="559.8" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="11" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Verificare &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;rol&lt;/span&gt;" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;fillWeight=-1;hachureGap=8;fillStyle=cross-hatch;fillColor=none;sketch=1;" vertex="1" parent="1">
+                    <mxGeometry x="560" y="480" width="160" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="" style="shape=flexArrow;endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="740" y="559.9300000000001" as="sourcePoint"/>
+                        <mxPoint x="820" y="559.76" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="13" value="" style="shape=flexArrow;endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="640" y="460" as="sourcePoint"/>
+                        <mxPoint x="640" y="380" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="14" value="" style="shape=flexArrow;endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="640" y="660" as="sourcePoint"/>
+                        <mxPoint x="640" y="740" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="639.8" y="717.27"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="17" value="Admin" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rotation=-90;" vertex="1" parent="1">
+                    <mxGeometry x="590" y="410" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="Student" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="740" y="528" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="Profesor" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rotation=90;" vertex="1" parent="1">
+                    <mxGeometry x="630" y="680" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="Frontend (&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;&lt;/span&gt;&lt;code data-end=&quot;396&quot; data-start=&quot;381&quot;&gt;Administrator&lt;/code&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;&lt;/span&gt;)" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="120" width="240" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="&lt;code data-end=&quot;342&quot; data-start=&quot;318&quot;&gt;Gestionare utilizatori&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="20">
+                    <mxGeometry x="40" y="40" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Setari &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;generale &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;ale &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;aplicatiei&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="20">
+                    <mxGeometry x="40" y="120" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="Frontend (&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;&lt;/span&gt;&lt;code data-end=&quot;760&quot; data-start=&quot;751&quot;&gt;Student&lt;/code&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;&lt;/span&gt;)" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="840" y="440" width="240" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Vizualizare &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;evenimente&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="21">
+                    <mxGeometry x="40" y="40" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Inscriere &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;la &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;evenimente&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="21">
+                    <mxGeometry x="40" y="120" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="Frontend (&lt;strong data-end=&quot;955&quot; data-start=&quot;928&quot;&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Organizatie / &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Profesor&lt;/span&gt;&lt;/strong&gt;)" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="760" width="240" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Postare &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;evenimente&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="22">
+                    <mxGeometry x="40" y="40" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;Gestionare &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;evenimente &lt;/span&gt;&lt;span class=&quot;BZ_Pyq_fadeIn&quot;&gt;proprii&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="22">
+                    <mxGeometry x="40" y="120" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="Organizatie" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rotation=-90;" vertex="1" parent="1">
+                    <mxGeometry x="580" y="680" width="80" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="&lt;code data-end=&quot;499&quot; data-start=&quot;469&quot;&gt;Backend / API / Baza de date&lt;/code&gt;" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="1360" y="120" width="240" height="880" as="geometry"/>
+                </mxCell>
+                <mxCell id="45" value="Proceseaza cererile din Frontend" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="34">
+                    <mxGeometry x="40" y="80" width="160" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" value="Stocheaza si preia date (evenimente, utilizatori, înscrieri)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="34">
+                    <mxGeometry x="40" y="200" width="160" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" value="" style="shape=flexArrow;endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="1100" y="559.6700000000001" as="sourcePoint"/>
+                        <mxPoint x="1340" y="560" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="37" value="" style="shape=flexArrow;endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="780" y="880.0600000000001" as="sourcePoint"/>
+                        <mxPoint x="1340" y="880" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="38" value="" style="shape=flexArrow;endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="780" y="239.89000000000004" as="sourcePoint"/>
+                        <mxPoint x="1340" y="240" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="39" value="&lt;code data-end=&quot;898&quot; data-start=&quot;860&quot;&gt;Cerere postare/gestionare evenimente&lt;/code&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="960" y="840" width="210" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" value="Cerere gestionare utilizatori / setari" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="970" y="200" width="190" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" value="Cerere înscriere la eveniment" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="1135" y="570" width="160" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" value="Cerere vizualizare evenimente" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="1130" y="520" width="170" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
