@@ -17,6 +17,7 @@ Pentru a rula aplicația, trebuie să ai instalat:
 
 ```bash
 DJANGO_ALLOWED_HOSTS=[DJANGO_ALLOWED_HOSTS]
+DJANGO_CORS_ALLOWED_ORIGINS=[DJANGO_CORS_ALLOWED_ORIGINS=]
 ```
 
 _Note: Înlocuiește conținutul din parantezele pătrate cu valorile corespunzătoare._

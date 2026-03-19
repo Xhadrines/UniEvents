@@ -6,7 +6,7 @@ from .facultate import FacultateView
 from .specializare import SpecializareView
 from .rol import RolView
 from .stare import StareView
-from .user import UserView
+from .user import UserView, RegisterView, LoginView
 from .user_profiles import UserProfilesView
 from .tip import TipView
 from .organizator import OrganizatorView

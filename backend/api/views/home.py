@@ -13,6 +13,8 @@ class HomeView(TemplateView):
             ("Rol", "/api/rol/"),
             ("Stare", "/api/stare/"),
             ("User", "/api/user/"),
+            ("Register", "/api/register/"),
+            ("Login", "/api/login/"),
             ("User Profiles", "/api/user_profiles/"),
             ("Tip", "/api/tip/"),
             ("Organizator", "/api/organizator/"),

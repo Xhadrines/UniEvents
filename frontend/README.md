@@ -16,7 +16,7 @@ Pentru a rula aplicația, trebuie să ai instalat:
 2. Creează un fișier `.env` și adaugă următoarea linie:
 
 ```bash
-VITE_CHAT_API=http://<IP_BACKEND>:<PORT_BACKEND>
+VITE_API=http://<IP_BACKEND>:<PORT_BACKEND>
 ```
 
 _Note: Înlocuiește `<IP_BACKEND>` și `<PORT_BACKEND>` cu valorile corespunzătoare pe care le obții de la backend._

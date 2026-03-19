@@ -9,7 +9,13 @@ class BaseService:
     def get_by_id(self, obj_id):
         return self.repository.get_by_id(obj_id)
 
-    def create(self, data):
+    def get_by_name(self, name):
+        return self.repository.get_by_name(name)
+
+    def get_id_by_name(self, name):
+        return self.repository.get_id_by_name(name)
+
+    def create(self, **data):
         return self.repository.create(**data)
 
     def update(self, obj_id, data):
