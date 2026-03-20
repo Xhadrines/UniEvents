@@ -1,28 +1,21 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { Header } from "../../components/Header/Header";
-import { SignUpForm } from "../../components/SignUpForm/SignUpForm";
+import { CompleteProfileForm } from "../../components/CompleteProfileForm/CompleteProfileForm";
 
-const SignUp = () => {
+const CompleteProfilePage = () => {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token") || "";
   const navigate = useNavigate();
 
   const handleBack = () => {
-    console.log("Back clicked");
     navigate("/log-in");
-  };
-
-  const handleRegister = () => {
-    console.log("Register clicked");
-  };
-
-  const handleGoogleRegister = () => {
-    console.log("Google Register clicked");
   };
 
   return (
     <div style={{ background: "var(--bg)", minHeight: "100svh" }}>
       <Header
-        title="UniEvents"
+        title="Completează Profilul"
         showBack={true}
         showDropdown={false}
         showDashboard={false}
@@ -36,13 +29,10 @@ const SignUp = () => {
           alignItems: "center",
         }}
       >
-        <SignUpForm
-          onRegister={handleRegister}
-          onGoogleRegister={handleGoogleRegister}
-        />
+        <CompleteProfileForm token={token} />
       </main>
     </div>
   );
 };
 
-export default SignUp;
+export default CompleteProfilePage;

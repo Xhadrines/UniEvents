@@ -18,6 +18,8 @@ Pentru a rula aplicația, trebuie să ai instalat:
 ```bash
 DJANGO_ALLOWED_HOSTS=[DJANGO_ALLOWED_HOSTS]
 DJANGO_CORS_ALLOWED_ORIGINS=[DJANGO_CORS_ALLOWED_ORIGINS=]
+EMAIL_HOST_USER=[EMAIL_HOST_USER]
+EMAIL_HOST_PASSWORD=[EMAIL_HOST_PASSWORD]
 ```
 
 _Note: Înlocuiește conținutul din parantezele pătrate cu valorile corespunzătoare._

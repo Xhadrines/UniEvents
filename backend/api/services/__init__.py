@@ -15,3 +15,6 @@ from .eveniment import EvenimentService
 from .sponsor import SponsorService
 from .sponsor_eveniment import SponsorEvenimentService
 from .inregistrare import InregistrareService
+
+from .email_token import EmailTokenService
+from .email import EmailService

@@ -6,6 +6,9 @@ from .user_profiles import UserProfilesService
 from .stare import StareService
 from .rol import RolService
 
+from .email_token import EmailTokenService
+from .email import EmailService
+
 
 class UserService(BaseService):
     def __init__(self):
@@ -14,6 +17,9 @@ class UserService(BaseService):
         self.profile_service = UserProfilesService()
         self.stare_service = StareService()
         self.rol_service = RolService()
+
+        self.email_token_service = EmailTokenService()
+        self.email_service = EmailService()
 
     def register(self, username: str, email: str, password: str):
         existing_user = self.user_repo.get_instance_by_username(username)
@@ -31,6 +37,10 @@ class UserService(BaseService):
             stare=stare,
             rol=rol,
         )
+
+        token_obj = self.email_token_service.create_token_for_user(user)
+
+        self.email_service.send_complete_profile_email(user, token_obj.token)
 
         return user
 

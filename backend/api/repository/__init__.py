@@ -15,3 +15,5 @@ from .eveniment import EvenimentRepository
 from .sponsor import SponsorRepository
 from .sponsor_eveniment import SponsorEvenimentRepository
 from .inregistrare import InregistrareRepository
+
+from .email_token import EmailTokenRepository

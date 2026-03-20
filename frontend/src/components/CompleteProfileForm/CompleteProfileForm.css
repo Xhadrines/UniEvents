@@ -1,4 +1,4 @@
-.signup-container {
+.complete-profile-container {
   width: 100%;
   max-width: 550px;
   margin: 0 auto;
@@ -12,14 +12,14 @@
   color: var(--text);
 }
 
-.signup-title {
+.complete-profile-title {
   font-size: 60px;
   font-weight: 600;
   text-align: center;
   margin-bottom: 24px;
 }
 
-.signup-label {
+.complete-profile-label {
   font-size: 20px;
   font-weight: 500;
   margin-bottom: 2px;
@@ -28,7 +28,7 @@
   color: var(--text-h);
 }
 
-.signup-input {
+.complete-profile-input {
   width: 100%;
   padding: 10px 0;
   border: none;
@@ -40,15 +40,15 @@
   transition: border-color 0.2s;
 }
 
-.signup-input::placeholder {
+.complete-profile-input::placeholder {
   color: var(--text);
 }
 
-.signup-input:focus {
+.complete-profile-input:focus {
   border-bottom-color: var(--accent);
 }
 
-.signup-btn {
+.complete-profile-btn {
   padding: 14px 18px;
   border: none;
   border-radius: 10px;
@@ -60,7 +60,7 @@
   transition: background 0.2s;
 }
 
-.signup-btn:hover {
+.complete-profile-btn:hover {
   background: #922ddb;
 }
 
@@ -97,20 +97,6 @@
   border-radius: 50%;
   padding: 2px;
   object-fit: contain;
-}
-
-.signup-text {
-  text-align: center;
-  font-size: 16px;
-}
-
-.signup-text a {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.signup-text a:hover {
-  text-decoration: underline;
 }
 
 main {

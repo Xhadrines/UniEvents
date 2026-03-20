@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./SignUpForm.css";
 
 type Props = {
@@ -5,42 +6,89 @@ type Props = {
   onGoogleRegister?: () => void;
 };
 
-export const SingUpForm = ({ onRegister, onGoogleRegister }: Props) => {
-  return (
-    <div className="singup-container">
-      <h2 className="singup-title">Sign Up</h2>
+export const SignUpForm = ({ onRegister, onGoogleRegister }: Props) => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState<{
+    text: string;
+    type: "success" | "error";
+  } | null>(null);
 
-      <label className="singup-label" htmlFor="username">
+  const handleRegister = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API}/api/register/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const data = await res.json();
+      console.log("Response from backend:", data);
+
+      if (res.ok) {
+        setMessage({
+          text: "Înregistrare reușită! Verifică email-ul pentru link-ul de completare profil.",
+          type: "success",
+        });
+        setUsername("");
+        setEmail("");
+        setPassword("");
+      } else {
+        setMessage({
+          text: data.error || "Eroare la înregistrare",
+          type: "error",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage({ text: "Eroare server", type: "error" });
+    }
+  };
+
+  return (
+    <div className="signup-container">
+      <h2 className="signup-title">Sign Up</h2>
+
+      <label className="signup-label" htmlFor="username">
         Username
       </label>
       <input
         id="username"
         type="text"
-        className="singup-input"
+        className="signup-input"
         placeholder="Introduceți username-ul"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
       />
 
-      <label className="singup-label" htmlFor="email">
+      <label className="signup-label" htmlFor="email">
         Email
       </label>
       <input
         id="email"
         type="email"
-        className="singup-input"
+        className="signup-input"
         placeholder="Introduceți email-ul"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
       />
 
-      <label className="singup-label" htmlFor="password">
+      <label className="signup-label" htmlFor="password">
         Password
       </label>
       <input
         id="password"
         type="password"
-        className="singup-input"
+        className="signup-input"
         placeholder="Introduceți parola"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button className="singup-btn" onClick={onRegister}>
+      <button className="signup-btn" onClick={handleRegister}>
         Sign Up
       </button>
 
@@ -52,6 +100,18 @@ export const SingUpForm = ({ onRegister, onGoogleRegister }: Props) => {
         />
         Înregistrează-te cu Google
       </button>
+
+      {message && (
+        <p
+          style={{
+            color: message.type === "success" ? "green" : "red",
+            textAlign: "center",
+            marginTop: "12px",
+          }}
+        >
+          {message.text}
+        </p>
+      )}
     </div>
   );
 };

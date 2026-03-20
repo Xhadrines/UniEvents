@@ -12,3 +12,5 @@ from .eveniment import Eveniment
 from .sponsor import Sponsor
 from .sponsor_eveniment import SponsorEveniment
 from .inregistrare import Inregistrare
+
+from .email_token import EmailToken

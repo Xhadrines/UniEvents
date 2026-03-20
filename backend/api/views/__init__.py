@@ -7,7 +7,7 @@ from .specializare import SpecializareView
 from .rol import RolView
 from .stare import StareView
 from .user import UserView, RegisterView, LoginView
-from .user_profiles import UserProfilesView
+from .user_profiles import UserProfilesView, CompleteProfileView
 from .tip import TipView
 from .organizator import OrganizatorView
 from .categorie import CategorieView
