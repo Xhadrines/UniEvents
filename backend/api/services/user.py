@@ -30,7 +30,7 @@ class UserService(BaseService):
         user = self.user_repo.create_user(username, email, password)
 
         stare = self.stare_service.get_by_name("Activ")
-        rol = self.rol_service.get_by_name("Student")
+        rol = self.rol_service.assign_role_from_email(user.email)
 
         self.profile_service.create(
             user=user,

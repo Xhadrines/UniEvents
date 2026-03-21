@@ -36,3 +36,16 @@ class UserRepository(BaseRepository):
             )
         except User.DoesNotExist:
             return None
+
+    @staticmethod
+    def get_or_create_google_user(email):
+        username_part = email.split("@")[0]
+
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                "username": username_part,
+            },
+        )
+
+        return user, created

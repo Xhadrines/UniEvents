@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useGoogleLogin } from "@react-oauth/google";
 import "./SignUpForm.css";
 
 type Props = {
@@ -48,6 +49,24 @@ export const SignUpForm = ({ onRegister, onGoogleRegister }: Props) => {
     }
   };
 
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      const res = await fetch(`${import.meta.env.VITE_API}/api/auth/google/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          token: tokenResponse.access_token,
+        }).toString(),
+      });
+
+      const data = await res.json();
+      console.log("Google login:", data);
+    },
+    onError: () => console.log("Login Failed"),
+  });
+
   return (
     <div className="signup-container">
       <h2 className="signup-title">Sign Up</h2>
@@ -92,7 +111,7 @@ export const SignUpForm = ({ onRegister, onGoogleRegister }: Props) => {
         Sign Up
       </button>
 
-      <button className="google-btn" onClick={onGoogleRegister}>
+      <button className="google-btn" onClick={() => googleLogin()}>
         <img
           src="/src/assets/google.svg"
           alt="Google"

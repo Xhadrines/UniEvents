@@ -164,6 +164,10 @@ def default_rol_data():
             "nume": "Organizatie",
             "descriere": "Rol pentru entitati juridice sau organizatii care interactioneaza cu platforma in scopul organizarii de evenimente, colaborarii institutionale sau promovarii de oportunitati pentru studenti si cadre didactice, fara a avea implicare directa in activitatile academice interne.",
         },
+        {
+            "nume": "Altele",
+            "descriere": "Rol pentru utilizatori care nu se încadrează în categoriile standard.",
+        },
     ]
 
 

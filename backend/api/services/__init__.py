@@ -18,3 +18,5 @@ from .inregistrare import InregistrareService
 
 from .email_token import EmailTokenService
 from .email import EmailService
+
+from .google_auth import GoogleAuthService

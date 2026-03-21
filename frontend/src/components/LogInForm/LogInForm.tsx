@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useGoogleLogin } from "@react-oauth/google";
 
 import "./LogInForm.css";
 
@@ -41,6 +42,24 @@ export const LogInForm = ({ onLogin, onGoogleLogin }: Props) => {
       setMessage({ text: "Eroare server", type: "error" });
     }
   };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      const res = await fetch(`${import.meta.env.VITE_API}/api/auth/google/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          token: tokenResponse.access_token,
+        }).toString(),
+      });
+
+      const data = await res.json();
+      console.log("Google login:", data);
+    },
+    onError: () => console.log("Login Failed"),
+  });
 
   return (
     <div className="login-container">
@@ -86,7 +105,7 @@ export const LogInForm = ({ onLogin, onGoogleLogin }: Props) => {
         </p>
       )}
 
-      <button className="google-btn" onClick={onGoogleLogin}>
+      <button className="google-btn" onClick={() => googleLogin()}>
         <img
           src="/src/assets/google.svg"
           alt="Google"

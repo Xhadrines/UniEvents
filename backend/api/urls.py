@@ -9,6 +9,7 @@ from .views import (
     UserView,
     RegisterView,
     LoginView,
+    GoogleAuthView,
     UserProfilesView,
     CompleteProfileView,
     TipView,
@@ -39,6 +40,7 @@ urlpatterns = [
     path("user/<int:pk>/", UserView.as_view(), name="user-detail"),
     path("register/", RegisterView.as_view(), name="register"),
     path("login/", LoginView.as_view(), name="login"),
+    path("auth/google/", GoogleAuthView.as_view(), name="google-auth"),
     path("user_profiles/", UserProfilesView.as_view(), name="user_profiles"),
     path(
         "user_profiles/<int:pk>/",

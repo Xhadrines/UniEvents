@@ -17,3 +17,5 @@ from .eveniment import EvenimentView
 from .sponsor import SponsorView
 from .sponsor_eveniment import SponsorEvenimentView
 from .inregistrare import InregistrareView
+
+from .google_auth import GoogleAuthView
