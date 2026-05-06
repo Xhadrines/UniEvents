@@ -29,7 +29,7 @@ from .default_data import (
     default_email_token_data,
 )
 
-APPS = ["api"]
+APPS = ["domain"]
 
 
 @receiver(post_migrate)

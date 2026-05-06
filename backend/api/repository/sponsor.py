@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import Sponsor
+from domain.models import Sponsor
 
 
 class SponsorRepository(BaseRepository):

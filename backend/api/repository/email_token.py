@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import EmailToken
+from domain.models import EmailToken
 
 
 class EmailTokenRepository(BaseRepository):

@@ -4,7 +4,7 @@ from rest_framework import status
 
 from .base_crud import BaseCRUDView
 from ..services import UserService
-from ..serializers import UserSerializer
+from domain.serializers import UserSerializer
 
 
 class UserView(BaseCRUDView):

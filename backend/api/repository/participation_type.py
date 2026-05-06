@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import ParticipationType
+from domain.models import ParticipationType
 
 
 class ParticipationTypeRepository(BaseRepository):

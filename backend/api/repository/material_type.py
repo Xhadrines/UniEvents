@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import MaterialType
+from domain.models import MaterialType
 
 
 class MaterialTypeRepository(BaseRepository):

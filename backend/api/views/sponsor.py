@@ -1,7 +1,7 @@
 from .base_crud import BaseCRUDView
 
 from ..services import SponsorService
-from ..serializers import SponsorSerializer
+from domain.serializers import SponsorSerializer
 
 
 class SponsorView(BaseCRUDView):

@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import Notification
+from domain.models import Notification
 
 
 class NotificationRepository(BaseRepository):

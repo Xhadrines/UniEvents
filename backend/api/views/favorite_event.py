@@ -4,7 +4,7 @@ from rest_framework import status
 
 from .base_crud import BaseCRUDView
 from ..services import FavoriteEventService, EventService
-from ..serializers import FavoriteEventSerializer
+from domain.serializers import FavoriteEventSerializer
 
 
 class FavoriteEventView(BaseCRUDView):

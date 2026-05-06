@@ -4,7 +4,7 @@ from rest_framework import status
 
 from .base_crud import BaseCRUDView
 from ..services import EventService, StatusService
-from ..serializers import EventSerializer
+from domain.serializers import EventSerializer
 
 
 class EventView(BaseCRUDView):

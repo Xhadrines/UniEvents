@@ -1,7 +1,7 @@
 from .base_crud import BaseCRUDView
 
 from ..services import OrganizerService
-from ..serializers import OrganizerSerializer
+from domain.serializers import OrganizerSerializer
 
 
 class OrganizerView(BaseCRUDView):

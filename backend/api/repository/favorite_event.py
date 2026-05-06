@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import FavoriteEvent
+from domain.models import FavoriteEvent
 
 
 class FavoriteEventRepository(BaseRepository):

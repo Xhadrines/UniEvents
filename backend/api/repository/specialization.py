@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import Specialization
+from domain.models import Specialization
 
 
 class SpecializationRepository(BaseRepository):

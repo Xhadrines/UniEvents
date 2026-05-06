@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import EventMaterial
+from domain.models import EventMaterial
 
 
 class EventMaterialRepository(BaseRepository):

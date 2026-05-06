@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import Feedback
+from domain.models import Feedback
 
 
 class FeedbackRepository(BaseRepository):

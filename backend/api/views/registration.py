@@ -4,7 +4,7 @@ from rest_framework import status
 
 from .base_crud import BaseCRUDView
 from ..services import RegistrationService, EventService, StatusService, EmailService
-from ..serializers import RegistrationSerializer
+from domain.serializers import RegistrationSerializer
 
 
 class RegistrationView(BaseCRUDView):

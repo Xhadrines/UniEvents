@@ -1,7 +1,7 @@
 from .base_crud import BaseCRUDView
 
 from ..services import FacultyService
-from ..serializers import FacultySerializer
+from domain.serializers import FacultySerializer
 
 
 class FacultyView(BaseCRUDView):

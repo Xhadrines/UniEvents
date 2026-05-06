@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from django.utils import timezone
 
-from ..repository import (
+from api.repository import (
     UserRepository,
     FacultyRepository,
     SpecializationRepository,

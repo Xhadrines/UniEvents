@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import OrganizerType
+from domain.models import OrganizerType
 
 
 class OrganizerTypeRepository(BaseRepository):

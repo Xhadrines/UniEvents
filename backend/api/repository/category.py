@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import Category
+from domain.models import Category
 
 
 class CategoryRepository(BaseRepository):

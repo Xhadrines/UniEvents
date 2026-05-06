@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import Event
+from domain.models import Event
 
 
 class EventRepository(BaseRepository):

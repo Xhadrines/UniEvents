@@ -4,7 +4,7 @@ from rest_framework import status
 
 from .base_crud import BaseCRUDView
 from ..services import FeedbackService, EventService
-from ..serializers import FeedbackSerializer
+from domain.serializers import FeedbackSerializer
 
 
 class FeedbackView(BaseCRUDView):

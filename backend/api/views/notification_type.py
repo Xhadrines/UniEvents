@@ -1,7 +1,7 @@
 from .base_crud import BaseCRUDView
 
 from ..services import NotificationTypeService
-from ..serializers import NotificationTypeSerializer
+from domain.serializers import NotificationTypeSerializer
 
 
 class NotificationTypeView(BaseCRUDView):

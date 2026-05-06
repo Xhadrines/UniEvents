@@ -1,7 +1,7 @@
 from .base_crud import BaseCRUDView
 
 from ..services import StatusService
-from ..serializers import StatusSerializer
+from domain.serializers import StatusSerializer
 
 
 class StatusView(BaseCRUDView):

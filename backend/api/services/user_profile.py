@@ -6,7 +6,7 @@ from ..repository import (
     SpecializationRepository,
 )
 
-from ..serializers import UserProfileSerializer
+from domain.serializers import UserProfileSerializer
 
 
 class UserProfileService(BaseService):

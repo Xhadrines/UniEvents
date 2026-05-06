@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import Role
+from domain.models import Role
 
 
 class RoleRepository(BaseRepository):

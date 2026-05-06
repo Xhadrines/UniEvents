@@ -1,7 +1,7 @@
 from .base_crud import BaseCRUDView
 
 from ..services import LocationService
-from ..serializers import LocationSerializer
+from domain.serializers import LocationSerializer
 
 
 class LocationView(BaseCRUDView):

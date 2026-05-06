@@ -1,7 +1,7 @@
 from .base_crud import BaseCRUDView
 
 from ..services import SpecializationService
-from ..serializers import SpecializationSerializer
+from domain.serializers import SpecializationSerializer
 
 
 class SpecializationView(BaseCRUDView):

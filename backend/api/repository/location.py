@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import Location
+from domain.models import Location
 
 
 class LocationRepository(BaseRepository):

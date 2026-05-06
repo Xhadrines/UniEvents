@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import Faculty
+from domain.models import Faculty
 
 
 class FacultyRepository(BaseRepository):

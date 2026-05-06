@@ -4,7 +4,7 @@ from rest_framework import status
 
 from .base_crud import BaseCRUDView
 from ..services import EventMaterialService, EventService, MaterialTypeService
-from ..serializers import EventMaterialSerializer
+from domain.serializers import EventMaterialSerializer
 
 
 class EventMaterialView(BaseCRUDView):

@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import UserProfile
+from domain.models import UserProfile
 
 
 class UserProfileRepository(BaseRepository):

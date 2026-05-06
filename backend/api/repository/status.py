@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import Status
+from domain.models import Status
 
 
 class StatusRepository(BaseRepository):

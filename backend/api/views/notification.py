@@ -4,7 +4,7 @@ from rest_framework import status
 
 from .base_crud import BaseCRUDView
 from ..services import NotificationService
-from ..serializers import NotificationSerializer
+from domain.serializers import NotificationSerializer
 
 
 class NotificationView(BaseCRUDView):

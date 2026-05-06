@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models import Registration
+from domain.models import Registration
 
 
 class RegistrationRepository(BaseRepository):

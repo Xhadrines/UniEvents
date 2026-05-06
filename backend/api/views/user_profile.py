@@ -4,7 +4,7 @@ from rest_framework import status
 
 from .base_crud import BaseCRUDView
 from ..services import UserProfileService, EmailTokenService
-from ..serializers import UserProfileSerializer
+from domain.serializers import UserProfileSerializer
 
 
 class UserProfileView(BaseCRUDView):

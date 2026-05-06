@@ -1,7 +1,7 @@
 from .base_crud import BaseCRUDView
 
 from ..services import CategoryService
-from ..serializers import CategorySerializer
+from domain.serializers import CategorySerializer
 
 
 class CategoryView(BaseCRUDView):
