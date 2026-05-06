@@ -1,4 +1,5 @@
 class BaseService:
+    # Service de baza pentru operatii comune
 
     def __init__(self, repository):
         self.repository = repository

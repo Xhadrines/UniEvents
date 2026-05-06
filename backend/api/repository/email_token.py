@@ -1,6 +1,6 @@
 from .base_repository import BaseRepository
 
-from ..models.email_token import EmailToken
+from ..models import EmailToken
 
 
 class EmailTokenRepository(BaseRepository):
@@ -8,4 +8,5 @@ class EmailTokenRepository(BaseRepository):
         super().__init__(EmailToken)
 
     def get_by_token(self, token):
-        return self.model.objects.filter(token=token, is_used=False).first()
+        # Returneaza token-ul de email
+        return self.model.objects.filter(token=token).first()

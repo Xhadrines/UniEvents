@@ -1,4 +1,4 @@
-from .base_crud_view import BaseCRUDView
+from .base_crud import BaseCRUDView
 
 from ..services import SponsorService
 from ..serializers import SponsorSerializer

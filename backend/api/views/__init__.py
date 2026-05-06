@@ -1,21 +1,44 @@
 from .home import HomeView
-
-from .base_crud_view import BaseCRUDView
-
-from .facultate import FacultateView
-from .specializare import SpecializareView
-from .rol import RolView
-from .stare import StareView
-from .user import UserView, RegisterView, LoginView
-from .user_profiles import UserProfilesView, CompleteProfileView
-from .tip import TipView
-from .organizator import OrganizatorView
-from .categorie import CategorieView
-from .tip_participare import TipParticipareView
-from .locatie import LocatieView
-from .eveniment import EvenimentView
+from .base_crud import BaseCRUDView
+from .category import CategoryView
+from .status import StatusView
+from .role import RoleView
+from .faculty import FacultyView
+from .specialization import SpecializationView
+from .participation_type import ParticipationTypeView
+from .location import LocationView
+from .organizer_type import OrganizerTypeView
+from .organizer import OrganizerView
+from .material_type import MaterialTypeView
 from .sponsor import SponsorView
-from .sponsor_eveniment import SponsorEvenimentView
-from .inregistrare import InregistrareView
-
+from .event_sponsor import EventSponsorView
+from .notification_type import NotificationTypeView
+from .report import ReportView
+from .email_token import EmailTokenView
+from .event import EventView, UpcomingEventsView, ValidateEventView, CancelEventView
+from .registration import (
+    RegistrationView,
+    RegisterToEventView,
+    CancelRegistrationView,
+    CheckInView,
+)
+from .feedback import FeedbackView, AddFeedbackView
+from .event_material import (
+    EventMaterialView,
+    EventMaterialsByEventView,
+    UploadEventMaterialView,
+)
+from .favorite_event import (
+    FavoriteEventView,
+    AddFavoriteEventView,
+    RemoveFavoriteEventView,
+)
+from .notification import (
+    NotificationView,
+    MyNotificationsView,
+    UnreadNotificationsView,
+    MarkNotificationAsReadView,
+)
+from .user_profile import UserProfileView, CompleteProfileView
+from .user import UserView, RegisterView, LoginView
 from .google_auth import GoogleAuthView

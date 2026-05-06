@@ -4,6 +4,9 @@ from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
+    # Serializer pentru tabela auth_user generata automat de Django
+    password = serializers.CharField(write_only=True, required=True)
+
     class Meta:
         model = User
         fields = [
@@ -21,8 +24,28 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "date_joined", "last_login"]
         extra_kwargs = {
-            "password": {"write_only": True},
             "is_superuser": {"required": False},
             "is_staff": {"required": False},
             "is_active": {"required": False},
         }
+
+    def create(self, validated_data):
+        # Parola trebuie salvata criptat, nu direct in baza de date
+        password = validated_data.pop("password")
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        # Daca se actualizeaza parola, trebuie criptata din nou
+        password = validated_data.pop("password", None)
+
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+
+        if password:
+            instance.set_password(password)
+
+        instance.save()
+        return instance

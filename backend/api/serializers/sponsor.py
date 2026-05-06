@@ -1,17 +1,18 @@
-from rest_framework import serializers
-
 from ..models import Sponsor
 
+from .base_serializer import BaseSerializer
 
-class SponsorSerializer(serializers.ModelSerializer):
+
+class SponsorSerializer(BaseSerializer):
     class Meta:
         model = Sponsor
         fields = [
             "id",
-            "nume",
-            "descriere",
+            "name",
+            "description",
             "link",
-            "stare",
+            "logo",
+            "status",
             "created_at",
             "updated_at",
         ]

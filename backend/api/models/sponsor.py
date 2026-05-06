@@ -1,18 +1,18 @@
 from django.db import models
 
-from .stare import Stare
+from .base_model import BaseModel
+from .status import Status
 
 
-class Sponsor(models.Model):
-    nume = models.CharField(max_length=150)
-    descriere = models.TextField()
+class Sponsor(BaseModel):
+    name = models.CharField(max_length=150)
+    description = models.TextField(blank=True)
     link = models.URLField(max_length=500, blank=True, null=True)
-    stare = models.ForeignKey(Stare, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    logo = models.ImageField(upload_to="sponsors/logos/", null=True, blank=True)
+    status = models.ForeignKey(Status, on_delete=models.PROTECT)
 
-    def __str__(self):
-        return f"{self.nume}"
+    def __str__(self) -> str:
+        return f"{self.name}"
 
     class Meta:
         db_table = "sponsors"

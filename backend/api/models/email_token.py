@@ -1,16 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
-
 import uuid
 
+from .base_model import BaseModel
 
-class EmailToken(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class EmailToken(BaseModel):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="email_tokens"
+    )
     token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     is_used = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.user.username} - {self.token}"
 
     class Meta:

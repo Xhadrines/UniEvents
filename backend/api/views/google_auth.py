@@ -11,7 +11,8 @@ class GoogleAuthView(APIView):
 
         if not token:
             return Response(
-                {"error": "Token missing"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "Token missing"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         service = GoogleAuthService()
@@ -19,7 +20,8 @@ class GoogleAuthView(APIView):
 
         if not result:
             return Response(
-                {"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "Invalid token or invalid student email"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         return Response(result, status=status.HTTP_200_OK)

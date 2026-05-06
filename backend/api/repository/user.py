@@ -1,6 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, get_user_model
+from django.db.models import Q
 
 from .base_repository import BaseRepository
 
@@ -9,43 +8,43 @@ class UserRepository(BaseRepository):
     def __init__(self):
         super().__init__(User)
 
-    def get_instance_by_username(self, username):
+    def get_by_username(self, username: str):
+        # Returneaza utilizatorul dupa username
         return self.model.objects.filter(username=username).first()
 
-    def get_id_by_username(self, username):
-        obj = self.model.objects.filter(username=username).only("id").first()
-        return obj.id if obj else None
+    def get_instance_by_username(self, username: str):
+        # Alias pentru compatibilitate cu datele default
+        return self.get_by_username(username)
 
-    def get_all_by_username(self, username):
-        return self.model.objects.filter(username=username)
-
-    def create_user(self, username, email, password):
-        return self.model.objects.create_user(
-            username=username, email=email, password=password
-        )
-
-    def authenticate_user(self, username, password):
-        return authenticate(username=username, password=password)
+    def get_by_email(self, email: str):
+        # Returneaza utilizatorul dupa email
+        return self.model.objects.filter(email=email).first()
 
     def get_user_by_username_or_email(self, username_or_email: str):
-        User = get_user_model()
+        # Cauta utilizator dupa username sau email
+        return self.model.objects.filter(
+            Q(username=username_or_email) | Q(email=username_or_email)
+        ).first()
 
-        try:
-            return User.objects.get(
-                models.Q(username=username_or_email) | models.Q(email=username_or_email)
-            )
-        except User.DoesNotExist:
-            return None
+    def create_user(self, **data):
+        # Creeaza utilizator cu parola criptata
+        password = data.pop("password", None)
+        user = self.model(**data)
 
-    @staticmethod
-    def get_or_create_google_user(email):
-        username_part = email.split("@")[0]
+        if password:
+            user.set_password(password)
 
-        user, created = User.objects.get_or_create(
+        user.save()
+        return user
+
+    def get_or_create_google_user(self, email: str):
+        # Creeaza sau returneaza userul autentificat prin Google
+        username = email.split("@")[0]
+
+        return self.model.objects.get_or_create(
             email=email,
             defaults={
-                "username": username_part,
+                "username": username,
+                "is_active": True,
             },
         )
-
-        return user, created

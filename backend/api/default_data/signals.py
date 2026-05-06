@@ -1,97 +1,215 @@
-from django.db.models.signals import post_migrate
-from django.dispatch import receiver
 from django.apps import apps
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
 
 from .default_data import (
     default_user_data,
-    default_faultate_data,
-    default_specializari_data,
-    default_rol_data,
-    default_stare_data,
-    default_user_profiles_data,
-    default_tip_data,
-    default_organizator_data,
-    default_categorie_data,
-    default_tip_participare_data,
-    default_locatie_data,
-    default_eveniment_data,
+    default_status_data,
+    default_role_data,
+    default_faculty_data,
+    default_specialization_data,
+    default_user_profile_data,
+    default_organizer_type_data,
+    default_organizer_data,
+    default_category_data,
+    default_participation_type_data,
+    default_location_data,
+    default_event_data,
     default_sponsor_data,
-    default_sponsor_eveniment_data,
-    default_inregistrare_data,
+    default_event_sponsor_data,
+    default_registration_data,
+    default_feedback_data,
+    default_material_type_data,
+    default_event_material_data,
+    default_favorite_event_data,
+    default_notification_type_data,
+    default_notification_data,
+    default_report_data,
+    default_email_token_data,
 )
-
 
 APPS = ["api"]
 
 
 @receiver(post_migrate)
 def insert_default_data(sender, **kwargs):
+    # Ruleaza seed-ul doar pentru aplicatia api
     app_name = sender.name.split(".")[-1]
+
     if app_name not in APPS:
         return
 
-    Facultate = apps.get_model(app_name, "Facultate")
-    for data in default_faultate_data():
-        Facultate.objects.get_or_create(nume=data["nume"], defaults=data)
+    Status = apps.get_model(app_name, "Status")
+    for data in default_status_data():
+        Status.objects.get_or_create(
+            name=data["name"],
+            defaults=data,
+        )
 
-    Specializare = apps.get_model(app_name, "Specializare")
-    for data in default_specializari_data():
-        Specializare.objects.get_or_create(nume=data["nume"], defaults=data)
+    Role = apps.get_model(app_name, "Role")
+    for data in default_role_data():
+        Role.objects.get_or_create(
+            name=data["name"],
+            defaults=data,
+        )
 
-    Rol = apps.get_model(app_name, "Rol")
-    for data in default_rol_data():
-        Rol.objects.get_or_create(nume=data["nume"], defaults=data)
+    Faculty = apps.get_model(app_name, "Faculty")
+    for data in default_faculty_data():
+        Faculty.objects.get_or_create(
+            name=data["name"],
+            defaults=data,
+        )
 
-    Stare = apps.get_model(app_name, "Stare")
-    for data in default_stare_data():
-        Stare.objects.get_or_create(nume=data["nume"], defaults=data)
+    Specialization = apps.get_model(app_name, "Specialization")
+    for data in default_specialization_data():
+        Specialization.objects.get_or_create(
+            name=data["name"],
+            faculty=data["faculty"],
+            defaults=data,
+        )
 
     for data in default_user_data():
-        data["password"] = make_password(data.pop("password"))
-        User.objects.get_or_create(email=data["email"], defaults=data)
+        password = data.pop("password")
 
-    UserProfiles = apps.get_model(app_name, "UserProfiles")
-    for data in default_user_profiles_data():
-        UserProfiles.objects.get_or_create(user=data["user"], defaults=data)
+        user, created = User.objects.get_or_create(
+            email=data["email"],
+            defaults=data,
+        )
 
-    Tip = apps.get_model(app_name, "Tip")
-    for data in default_tip_data():
-        Tip.objects.get_or_create(nume=data["nume"], defaults=data)
+        if created:
+            user.set_password(password)
+            user.save()
 
-    Organizator = apps.get_model(app_name, "Organizator")
-    for data in default_organizator_data():
-        Organizator.objects.get_or_create(user=data["user"], defaults=data)
+    UserProfile = apps.get_model(app_name, "UserProfile")
+    for data in default_user_profile_data():
+        UserProfile.objects.get_or_create(
+            user=data["user"],
+            defaults=data,
+        )
 
-    Categorie = apps.get_model(app_name, "Categorie")
-    for data in default_categorie_data():
-        Categorie.objects.get_or_create(nume=data["nume"], defaults=data)
+    OrganizerType = apps.get_model(app_name, "OrganizerType")
+    for data in default_organizer_type_data():
+        OrganizerType.objects.get_or_create(
+            name=data["name"],
+            defaults=data,
+        )
 
-    TipParticipare = apps.get_model(app_name, "TipParticipare")
-    for data in default_tip_participare_data():
-        TipParticipare.objects.get_or_create(nume=data["nume"], defaults=data)
+    Organizer = apps.get_model(app_name, "Organizer")
+    for data in default_organizer_data():
+        Organizer.objects.get_or_create(
+            user=data["user"],
+            defaults=data,
+        )
 
-    Locatie = apps.get_model(app_name, "Locatie")
-    for data in default_locatie_data():
-        Locatie.objects.get_or_create(nume=data["nume"], defaults=data)
+    Category = apps.get_model(app_name, "Category")
+    for data in default_category_data():
+        Category.objects.get_or_create(
+            name=data["name"],
+            defaults=data,
+        )
 
-    Eveniment = apps.get_model(app_name, "Eveniment")
-    for data in default_eveniment_data():
-        Eveniment.objects.get_or_create(nume=data["nume"], defaults=data)
+    ParticipationType = apps.get_model(app_name, "ParticipationType")
+    for data in default_participation_type_data():
+        ParticipationType.objects.get_or_create(
+            name=data["name"],
+            defaults=data,
+        )
+
+    Location = apps.get_model(app_name, "Location")
+    for data in default_location_data():
+        Location.objects.get_or_create(
+            name=data["name"],
+            defaults=data,
+        )
+
+    Event = apps.get_model(app_name, "Event")
+    for data in default_event_data():
+        Event.objects.get_or_create(
+            name=data["name"],
+            defaults=data,
+        )
 
     Sponsor = apps.get_model(app_name, "Sponsor")
     for data in default_sponsor_data():
-        Sponsor.objects.get_or_create(nume=data["nume"], defaults=data)
-
-    SponsorEveniment = apps.get_model(app_name, "SponsorEveniment")
-    for data in default_sponsor_eveniment_data():
-        SponsorEveniment.objects.get_or_create(
-            sponsor=data["sponsor"], eveniment=data["eveniment"], defaults=data
+        Sponsor.objects.get_or_create(
+            name=data["name"],
+            defaults=data,
         )
 
-    Inregistrare = apps.get_model(app_name, "Inregistrare")
-    for data in default_inregistrare_data():
-        Inregistrare.objects.get_or_create(
-            user=data["user"], eveniment=data["eveniment"], defaults=data
+    EventSponsor = apps.get_model(app_name, "EventSponsor")
+    for data in default_event_sponsor_data():
+        EventSponsor.objects.get_or_create(
+            sponsor=data["sponsor"],
+            event=data["event"],
+            defaults=data,
+        )
+
+    Registration = apps.get_model(app_name, "Registration")
+    for data in default_registration_data():
+        Registration.objects.get_or_create(
+            user=data["user"],
+            event=data["event"],
+            defaults=data,
+        )
+
+    Feedback = apps.get_model(app_name, "Feedback")
+    for data in default_feedback_data():
+        Feedback.objects.get_or_create(
+            user=data["user"],
+            event=data["event"],
+            defaults=data,
+        )
+
+    MaterialType = apps.get_model(app_name, "MaterialType")
+    for data in default_material_type_data():
+        MaterialType.objects.get_or_create(
+            name=data["name"],
+            defaults=data,
+        )
+
+    EventMaterial = apps.get_model(app_name, "EventMaterial")
+    for data in default_event_material_data():
+        EventMaterial.objects.get_or_create(
+            event=data["event"],
+            title=data["title"],
+            defaults=data,
+        )
+
+    FavoriteEvent = apps.get_model(app_name, "FavoriteEvent")
+    for data in default_favorite_event_data():
+        FavoriteEvent.objects.get_or_create(
+            user=data["user"],
+            event=data["event"],
+            defaults=data,
+        )
+
+    NotificationType = apps.get_model(app_name, "NotificationType")
+    for data in default_notification_type_data():
+        NotificationType.objects.get_or_create(
+            name=data["name"],
+            defaults=data,
+        )
+
+    Notification = apps.get_model(app_name, "Notification")
+    for data in default_notification_data():
+        Notification.objects.get_or_create(
+            user=data["user"],
+            title=data["title"],
+            defaults=data,
+        )
+
+    Report = apps.get_model(app_name, "Report")
+    for data in default_report_data():
+        Report.objects.get_or_create(
+            title=data["title"],
+            defaults=data,
+        )
+
+    EmailToken = apps.get_model(app_name, "EmailToken")
+    for data in default_email_token_data():
+        EmailToken.objects.get_or_create(
+            user=data["user"],
+            is_used=data["is_used"],
+            defaults=data,
         )

@@ -1,23 +1,24 @@
-import os
 import requests
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from ..repository import UserRepository
-from . import StareService, RolService, UserProfilesService
 
+from .status import StatusService
+from .role import RoleService
+from .user_profile import UserProfileService
 from .email_token import EmailTokenService
 from .email import EmailService
 
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-
 
 class GoogleAuthService:
-    def __init__(self):
-        self.stare_service = StareService()
-        self.rol_service = RolService()
-        self.profile_service = UserProfilesService()
+    # Service pentru autentificarea studentilor cu Google OAuth
 
+    def __init__(self):
+        self.user_repository = UserRepository()
+        self.status_service = StatusService()
+        self.role_service = RoleService()
+        self.profile_service = UserProfileService()
         self.email_token_service = EmailTokenService()
         self.email_service = EmailService()
 
@@ -26,30 +27,37 @@ class GoogleAuthService:
             response = requests.get(
                 "https://www.googleapis.com/oauth2/v2/userinfo",
                 headers={"Authorization": f"Bearer {access_token}"},
+                timeout=10,
             )
+
             if response.status_code != 200:
                 return None
 
             userinfo = response.json()
-            email = userinfo["email"]
+            email = userinfo.get("email")
+            google_sub = userinfo.get("id")
 
-            user, created = UserRepository.get_or_create_google_user(email=email)
+            if not email or not email.endswith("@student.usv.ro"):
+                return None
+
+            user, created = self.user_repository.get_or_create_google_user(email=email)
 
             if created:
                 user.set_unusable_password()
                 user.save()
 
-                stare = self.stare_service.get_by_name("Activ")
-                rol = self.rol_service.assign_role_from_email(email)
+                status = self.status_service.get_by_name("Activ")
+                role = self.role_service.assign_role_from_email(email)
 
                 self.profile_service.create(
                     user=user,
-                    stare=stare,
-                    rol=rol,
+                    status=status,
+                    role=role,
+                    google_sub=google_sub,
+                    is_google_student=True,
                 )
 
                 token_obj = self.email_token_service.create_token_for_user(user)
-
                 self.email_service.send_complete_profile_email(user, token_obj.token)
 
             refresh = RefreshToken.for_user(user)
@@ -59,5 +67,5 @@ class GoogleAuthService:
                 "refresh": str(refresh),
             }
 
-        except Exception:
+        except requests.RequestException:
             return None
