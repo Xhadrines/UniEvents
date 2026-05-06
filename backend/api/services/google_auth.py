@@ -60,11 +60,30 @@ class GoogleAuthService:
                 token_obj = self.email_token_service.create_token_for_user(user)
                 self.email_service.send_complete_profile_email(user, token_obj.token)
 
+            profile = self.profile_service.get_by_user_id(user.id)
             refresh = RefreshToken.for_user(user)
 
             return {
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
+                "user_id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "profile": (
+                    None
+                    if not profile
+                    else {
+                        "id": profile.id,
+                        "status": profile.status_id,
+                        "role": profile.role_id,
+                        "faculty": profile.faculty_id,
+                        "specialization": profile.specialization_id,
+                        "study_year": profile.study_year,
+                        "group": profile.group,
+                        "semi_group": profile.semi_group,
+                    }
+                ),
+                "created": created,
             }
 
         except requests.RequestException:

@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
+
 import "./SignUpForm.css";
 
 type Props = {
@@ -8,6 +10,8 @@ type Props = {
 };
 
 export const SignUpForm = ({ onRegister, onGoogleRegister }: Props) => {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +19,21 @@ export const SignUpForm = ({ onRegister, onGoogleRegister }: Props) => {
     text: string;
     type: "success" | "error";
   } | null>(null);
+
+  const saveAuthData = (data: any) => {
+    localStorage.setItem("access", data.access);
+    localStorage.setItem("refresh", data.refresh);
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        user_id: data.user_id,
+        username: data.username,
+        email: data.email,
+        profile: data.profile,
+      }),
+    );
+  };
 
   const handleRegister = async () => {
     try {
@@ -30,16 +49,19 @@ export const SignUpForm = ({ onRegister, onGoogleRegister }: Props) => {
       console.log("Response from backend:", data);
 
       if (res.ok) {
+        onRegister?.();
+
         setMessage({
           text: "Înregistrare reușită! Verifică email-ul pentru link-ul de completare profil.",
           type: "success",
         });
+
         setUsername("");
         setEmail("");
         setPassword("");
       } else {
         setMessage({
-          text: data.error || "Eroare la înregistrare",
+          text: data.error || data.detail || "Eroare la înregistrare",
           type: "error",
         });
       }
@@ -51,20 +73,54 @@ export const SignUpForm = ({ onRegister, onGoogleRegister }: Props) => {
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      const res = await fetch(`${import.meta.env.VITE_API}/api/auth/google/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          token: tokenResponse.access_token,
-        }).toString(),
-      });
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API}/api/auth/google/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+              token: tokenResponse.access_token,
+            }).toString(),
+          },
+        );
 
-      const data = await res.json();
-      console.log("Google login:", data);
+        const data = await res.json();
+        console.log("Google register/login:", data);
+
+        if (res.ok) {
+          saveAuthData(data);
+
+          onGoogleRegister?.();
+
+          setMessage({
+            text: data.created
+              ? "Cont creat cu Google cu succes!"
+              : "Autentificare cu Google reușită!",
+            type: "success",
+          });
+
+          navigate("/home");
+        } else {
+          setMessage({
+            text:
+              data.error || data.detail || "Eroare la autentificare cu Google",
+            type: "error",
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        setMessage({ text: "Eroare server Google", type: "error" });
+      }
     },
-    onError: () => console.log("Login Failed"),
+    onError: () => {
+      setMessage({
+        text: "Autentificarea cu Google a eșuat",
+        type: "error",
+      });
+    },
   });
 
   return (

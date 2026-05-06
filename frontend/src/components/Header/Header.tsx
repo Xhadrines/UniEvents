@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import { Dropdown } from "../Dropdown/Dropdown";
 import "./Header.css";
 
@@ -22,10 +24,35 @@ export const Header = ({
   showDashboard,
   onBack,
 }: Props) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("user");
+
+    navigate("/log-in", { replace: true });
+  };
+
   const dropdownOptions = [
-    { icon: userIcon, label: "Profil", show: true },
-    { icon: dashboardIcon, label: "Panou de control", show: showDashboard },
-    { icon: logoutIcon, label: "Deconectare", show: true },
+    {
+      icon: userIcon,
+      label: "Profil",
+      show: true,
+      onClick: () => navigate("/profile"),
+    },
+    {
+      icon: dashboardIcon,
+      label: "Panou de control",
+      show: showDashboard,
+      onClick: () => navigate("/dashboard"),
+    },
+    {
+      icon: logoutIcon,
+      label: "Deconectare",
+      show: true,
+      onClick: handleLogout,
+    },
   ];
 
   return (
@@ -37,7 +64,9 @@ export const Header = ({
           </button>
         )}
       </div>
+
       <div className="header-center">{title}</div>
+
       <div className="header-right">
         {showDropdown && (
           <Dropdown options={dropdownOptions} triggerIcon={moreIcon} />

@@ -5,6 +5,7 @@ type Option = {
   icon: string;
   label: string;
   show?: boolean;
+  onClick?: () => void;
 };
 
 type Props = {
@@ -22,8 +23,12 @@ export const Dropdown = ({ options, triggerIcon }: Props) => {
         setOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   return (
@@ -31,12 +36,20 @@ export const Dropdown = ({ options, triggerIcon }: Props) => {
       <button className="dropdown-btn" onClick={() => setOpen(!open)}>
         <img src={triggerIcon} alt="more" className="dropdown-trigger-icon" />
       </button>
+
       {open && (
         <div className="dropdown-menu">
           {options
             .filter((opt) => opt.show !== false)
             .map((opt) => (
-              <button key={opt.label} className="dropdown-item">
+              <button
+                key={opt.label}
+                className="dropdown-item"
+                onClick={() => {
+                  opt.onClick?.();
+                  setOpen(false);
+                }}
+              >
                 <img src={opt.icon} alt={opt.label} />
                 <span>{opt.label}</span>
               </button>
