@@ -40,5 +40,11 @@ from .notification import (
     MarkNotificationAsReadView,
 )
 from .user_profile import UserProfileView, CompleteProfileView
-from .user import UserView, RegisterView, LoginView
+from .user import (
+    UserView,
+    RegisterView,
+    LoginView,
+    PasswordResetRequestView,
+    PasswordResetConfirmView,
+)
 from .google_auth import GoogleAuthView

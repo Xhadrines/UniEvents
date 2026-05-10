@@ -64,3 +64,59 @@ class LoginView(APIView):
             {"message": "Login endpoint - send POST request"},
             status=status.HTTP_200_OK,
         )
+
+
+class PasswordResetRequestView(APIView):
+    def post(self, request):
+        user_service = UserService()
+
+        try:
+            user_service.request_password_reset(
+                email=request.data.get("email"),
+            )
+
+            return Response(
+                {"message": "Dacă email-ul există, vei primi un link de resetare."},
+                status=status.HTTP_200_OK,
+            )
+
+        except ValueError as error:
+            return Response(
+                {"error": str(error)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def get(self, request):
+        return Response(
+            {"message": "Password reset endpoint - send POST request"},
+            status=status.HTTP_200_OK,
+        )
+
+
+class PasswordResetConfirmView(APIView):
+    def post(self, request):
+        user_service = UserService()
+
+        try:
+            user_service.confirm_password_reset(
+                uid=request.data.get("uid"),
+                token=request.data.get("token"),
+                password=request.data.get("password"),
+            )
+
+            return Response(
+                {"message": "Parola a fost resetată cu succes."},
+                status=status.HTTP_200_OK,
+            )
+
+        except ValueError as error:
+            return Response(
+                {"error": str(error)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def get(self, request):
+        return Response(
+            {"message": "Password reset confirm endpoint - send POST request"},
+            status=status.HTTP_200_OK,
+        )

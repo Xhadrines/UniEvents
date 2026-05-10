@@ -1,3 +1,7 @@
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+
 from .base_service import BaseService
 from ..repository import UserRepository
 
@@ -74,3 +78,35 @@ class UserService(BaseService):
                 }
             ),
         }
+
+    def request_password_reset(self, email: str):
+        if not email:
+            raise ValueError("Email is required")
+
+        user = self.user_repository.get_by_email(email)
+
+        if not user:
+            return
+
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+
+        self.email_service.send_password_reset_email(user, uid, token)
+
+    def confirm_password_reset(self, uid: str, token: str, password: str):
+        if not uid or not token or not password:
+            raise ValueError("UID, token and password are required")
+
+        try:
+            user_id = force_str(urlsafe_base64_decode(uid))
+            user = self.user_repository.get_by_id(user_id)
+        except Exception:
+            raise ValueError("Invalid reset link")
+
+        if not user:
+            raise ValueError("Invalid reset link")
+
+        if not default_token_generator.check_token(user, token):
+            raise ValueError("Invalid or expired token")
+
+        self.user_repository.set_password(user, password)

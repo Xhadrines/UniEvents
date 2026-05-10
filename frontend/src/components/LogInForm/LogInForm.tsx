@@ -177,6 +177,10 @@ export const LogInForm = ({ onLogin, onGoogleLogin }: Props) => {
       <p className="signup-text">
         Nu ai cont? <a href="/sign-up">Creează unul!</a>
       </p>
+
+      <p className="signup-text">
+        Ți-ai uitat parola? <a href="/reset-password">Reseteaz-o!</a>
+      </p>
     </div>
   );
 };

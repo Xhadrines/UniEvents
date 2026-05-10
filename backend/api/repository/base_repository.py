@@ -80,3 +80,8 @@ class BaseRepository:
     def get_instance_by_name(self, name: str) -> Optional[models.Model]:
         # Alias pastrat pentru compatibilitate cu datele default
         return self.get_by_name(name)
+
+    def set_password(self, user, password: str):
+        user.set_password(password)
+        user.save()
+        return user

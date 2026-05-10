@@ -3,6 +3,8 @@ import { MainLayout } from "../layouts/MainLayout";
 
 import LogIn from "../pages/Login/LogIn";
 import SignUp from "../pages/SignUp/SignUp";
+import { ResetPassword } from "../pages/ResetPassword/ResetPassword";
+import { ResetPasswordConfirm } from "../pages/ResetPasswordConfirm/ResetPasswordConfirm";
 import CompleteProfilePage from "../pages/CompleteProfile/CompleteProfile";
 import Home from "../pages/Home/Home";
 
@@ -26,6 +28,11 @@ export const AppRouter = () => {
 
           <Route path="/log-in" element={<LogIn />} />
           <Route path="/sign-up" element={<SignUp />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route
+            path="/reset-password-confirm"
+            element={<ResetPasswordConfirm />}
+          />
           <Route path="/complete-profile" element={<CompleteProfilePage />} />
 
           <Route
