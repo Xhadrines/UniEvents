@@ -101,6 +101,141 @@
   font: inherit;
 }
 
+.filter-picker-field {
+  display: grid;
+  gap: 7px;
+  font-size: 0.92rem;
+  color: var(--text-h);
+}
+
+.filter-picker-button {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  padding: 11px 12px;
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+.filter-picker-button:hover {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.filter-picker-button span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filter-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 20, 0.64);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 9999;
+}
+
+.filter-modal {
+  width: min(560px, 100%);
+  max-height: min(82svh, 760px);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.filter-modal-header h2 {
+  margin: 6px 0 0;
+  color: var(--text-h);
+  font-size: 1.35rem;
+}
+
+.filter-modal-search {
+  width: 100%;
+  margin-top: 18px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  padding: 12px 14px;
+  font: inherit;
+  outline: none;
+}
+
+.filter-modal-search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.filter-modal-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.filter-modal-option {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-h);
+  border-radius: 12px;
+  padding: 11px 12px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+.filter-modal-option:hover,
+.filter-modal-option.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.filter-modal-option.active {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.filter-modal-empty {
+  margin: 10px 0 0;
+  color: var(--text);
+}
+
 .filter-mode-row,
 .view-buttons-sidebar {
   display: grid;

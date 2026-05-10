@@ -19,6 +19,7 @@ moment.locale("ro", {
 const localizer = momentLocalizer(moment);
 
 type FilterMode = "and" | "or";
+type FilterKey = "category" | "location" | "organizer" | "participation";
 
 type DescribedEntity = {
   id: number;
@@ -162,6 +163,8 @@ export const HomeComponent = () => {
   const [participationTypesList, setParticipationTypesList] = useState<
     DescribedEntity[]
   >([]);
+  const [activeFilter, setActiveFilter] = useState<FilterKey | null>(null);
+  const [filterSearch, setFilterSearch] = useState("");
 
   const categories = ["Toate", ...categoriesList.map((c) => c.name)];
   const locations = ["Toate", ...locationsList.map((l) => l.name)];
@@ -170,6 +173,68 @@ export const HomeComponent = () => {
     "Toate",
     ...participationTypesList.map((p) => p.name),
   ];
+
+  const filterConfigs: Record<
+    FilterKey,
+    {
+      title: string;
+      label: string;
+      value: string;
+      options: string[];
+      onSelect: (value: string) => void;
+    }
+  > = {
+    category: {
+      title: "Alege categoria",
+      label: "Categorie",
+      value: selectedCategory,
+      options: categories,
+      onSelect: setSelectedCategory,
+    },
+    location: {
+      title: "Alege locația",
+      label: "Locație",
+      value: selectedLocation,
+      options: locations,
+      onSelect: setSelectedLocation,
+    },
+    organizer: {
+      title: "Alege organizatorul",
+      label: "Organizator",
+      value: selectedOrganizer,
+      options: organizers,
+      onSelect: setSelectedOrganizer,
+    },
+    participation: {
+      title: "Alege tipul de participare",
+      label: "Participare",
+      value: selectedParticipation,
+      options: participations,
+      onSelect: setSelectedParticipation,
+    },
+  };
+
+  const currentFilterConfig = activeFilter ? filterConfigs[activeFilter] : null;
+  const visibleFilterOptions = currentFilterConfig
+    ? currentFilterConfig.options.filter((option) =>
+        option.toLowerCase().includes(filterSearch.trim().toLowerCase()),
+      )
+    : [];
+
+  const openFilterModal = (filter: FilterKey) => {
+    setActiveFilter(filter);
+    setFilterSearch("");
+  };
+
+  const closeFilterModal = () => {
+    setActiveFilter(null);
+    setFilterSearch("");
+  };
+
+  const selectFilterOption = (value: string) => {
+    currentFilterConfig?.onSelect(value);
+    closeFilterModal();
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -337,7 +402,10 @@ export const HomeComponent = () => {
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeDetails();
+      if (event.key === "Escape") {
+        closeDetails();
+        closeFilterModal();
+      }
     };
 
     window.addEventListener("keydown", handleEscape);
@@ -354,60 +422,53 @@ export const HomeComponent = () => {
           </div>
 
           <div className="filter-stack">
-            <label>
-              Categorie
-              <select
-                value={selectedCategory}
-                onChange={(event) => setSelectedCategory(event.target.value)}
+            <div className="filter-picker-field">
+              <span>Categorie</span>
+              <button
+                type="button"
+                className="filter-picker-button"
+                onClick={() => openFilterModal("category")}
               >
-                {categories.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Locație
-              <select
-                value={selectedLocation}
-                onChange={(event) => setSelectedLocation(event.target.value)}
+                <span>{selectedCategory}</span>
+                <span aria-hidden="true">⌄</span>
+              </button>
+            </div>
+
+            <div className="filter-picker-field">
+              <span>Locație</span>
+              <button
+                type="button"
+                className="filter-picker-button"
+                onClick={() => openFilterModal("location")}
               >
-                {locations.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Organizator
-              <select
-                value={selectedOrganizer}
-                onChange={(event) => setSelectedOrganizer(event.target.value)}
+                <span>{selectedLocation}</span>
+                <span aria-hidden="true">⌄</span>
+              </button>
+            </div>
+
+            <div className="filter-picker-field">
+              <span>Organizator</span>
+              <button
+                type="button"
+                className="filter-picker-button"
+                onClick={() => openFilterModal("organizer")}
               >
-                {organizers.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Participare
-              <select
-                value={selectedParticipation}
-                onChange={(event) =>
-                  setSelectedParticipation(event.target.value)
-                }
+                <span>{selectedOrganizer}</span>
+                <span aria-hidden="true">⌄</span>
+              </button>
+            </div>
+
+            <div className="filter-picker-field">
+              <span>Participare</span>
+              <button
+                type="button"
+                className="filter-picker-button"
+                onClick={() => openFilterModal("participation")}
               >
-                {participations.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
+                <span>{selectedParticipation}</span>
+                <span aria-hidden="true">⌄</span>
+              </button>
+            </div>
 
             <div className="filter-mode-row">
               <span>Combinare</span>
@@ -548,6 +609,60 @@ export const HomeComponent = () => {
           />
         </div>
       </section>
+
+      {currentFilterConfig && (
+        <div className="filter-modal-backdrop" onClick={closeFilterModal}>
+          <div
+            className="filter-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="filter-modal-header">
+              <div>
+                <span className="modal-kicker">Filtrare</span>
+                <h2>{currentFilterConfig.title}</h2>
+              </div>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={closeFilterModal}
+              >
+                ×
+              </button>
+            </div>
+
+            <input
+              className="filter-modal-search"
+              type="search"
+              value={filterSearch}
+              onChange={(event) => setFilterSearch(event.target.value)}
+              placeholder={`Caută în ${currentFilterConfig.label.toLowerCase()}...`}
+              autoFocus
+            />
+
+            <div className="filter-modal-list">
+              {visibleFilterOptions.length > 0 ? (
+                visibleFilterOptions.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    className={
+                      option === currentFilterConfig.value
+                        ? "filter-modal-option active"
+                        : "filter-modal-option"
+                    }
+                    onClick={() => selectFilterOption(option)}
+                  >
+                    <span>{option}</span>
+                    {option === currentFilterConfig.value && <strong>✓</strong>}
+                  </button>
+                ))
+              ) : (
+                <p className="filter-modal-empty">Nu există rezultate.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {modalOpen && selectedEvent && (
         <div className="event-modal-backdrop" onClick={closeDetails}>
