@@ -9,6 +9,16 @@ type Props = {
   onGoogleRegister?: () => void;
 };
 
+type AuthResponse = {
+  access: string;
+  refresh: string;
+  user_id: string | number;
+  username: string;
+  email: string;
+  profile: unknown;
+  created?: boolean;
+};
+
 export const SignUpForm = ({ onRegister, onGoogleRegister }: Props) => {
   const navigate = useNavigate();
 
@@ -20,7 +30,7 @@ export const SignUpForm = ({ onRegister, onGoogleRegister }: Props) => {
     type: "success" | "error";
   } | null>(null);
 
-  const saveAuthData = (data: any) => {
+  const saveAuthData = (data: AuthResponse) => {
     localStorage.setItem("access", data.access);
     localStorage.setItem("refresh", data.refresh);
 

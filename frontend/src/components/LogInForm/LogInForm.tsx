@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 
@@ -7,6 +7,15 @@ import "./LogInForm.css";
 type Props = {
   onLogin?: () => void;
   onGoogleLogin?: () => void;
+};
+
+type AuthResponse = {
+  access: string;
+  refresh: string;
+  user_id: string | number;
+  username: string;
+  email: string;
+  profile: unknown;
 };
 
 export const LogInForm = ({ onLogin, onGoogleLogin }: Props) => {
@@ -19,7 +28,7 @@ export const LogInForm = ({ onLogin, onGoogleLogin }: Props) => {
     type: "success" | "error";
   } | null>(null);
 
-  const saveAuthData = (data: any) => {
+  const saveAuthData = (data: AuthResponse) => {
     localStorage.setItem("access", data.access);
     localStorage.setItem("refresh", data.refresh);
 
