@@ -1,27 +1,24 @@
-from .default_data import (
-    default_user_data,
-    default_status_data,
-    default_role_data,
-    default_faculty_data,
-    default_specialization_data,
-    default_user_profile_data,
-    default_organizer_type_data,
-    default_organizer_data,
-    default_category_data,
-    default_participation_type_data,
-    default_location_data,
-    default_event_data,
-    default_sponsor_data,
-    default_event_sponsor_data,
-    default_registration_data,
-    default_feedback_data,
-    default_material_type_data,
-    default_event_material_data,
-    default_favorite_event_data,
-    default_notification_type_data,
-    default_notification_data,
-    default_report_data,
-    default_email_token_data,
-)
-
-from .signals import insert_default_data
+from .utils import aware
+from .user import default_user_data
+from .role import default_role_data
+from .status import default_status_data
+from .faculty import default_faculty_data
+from .specialization import default_specialization_data
+from .user_profile import default_user_profile_data
+from .organizer_type import default_organizer_type_data
+from .organizer import default_organizer_data
+from .category import default_category_data
+from .participation_type import default_participation_type_data
+from .location import default_location_data
+from .event import default_event_data
+from .sponsor import default_sponsor_data
+from .event_sponsor import default_event_sponsor_data
+from .registration import default_registration_data
+from .feedback import default_feedback_data
+from .material_type import default_material_type_data
+from .event_material import default_event_material_data
+from .favorite_event import default_favorite_event_data
+from .notification_type import default_notification_type_data
+from .notification import default_notification_data
+from .report import default_report_data
+from .email_token import default_email_token_data
