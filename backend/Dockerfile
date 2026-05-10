@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 2307
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:2307", "--noreload"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:2307"]

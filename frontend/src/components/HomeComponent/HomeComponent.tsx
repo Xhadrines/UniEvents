@@ -18,204 +18,55 @@ moment.locale("ro", {
 
 const localizer = momentLocalizer(moment);
 
-type EventStatus = "Active" | "Inactive" | "Pending" | "Cancelled";
-type ParticipationType = "Fizic" | "Online" | "Hibrid";
 type FilterMode = "and" | "or";
+
+type DescribedEntity = {
+  id: number;
+  name: string;
+  description?: string | null;
+};
+
+type OrganizerEntity = DescribedEntity & {
+  link?: string | null;
+  organizer_type?: DescribedEntity | null;
+};
+
+type LocationEntity = DescribedEntity & {
+  address: string;
+  building?: string | null;
+  room?: string | null;
+};
+
+type RawEventRecord = Record<string, unknown>;
 
 type EventItem = {
   id: number;
   name: string;
   description: string;
-  faculty: {
-    id: number;
-    name: string;
-  };
-  category: {
-    id: number;
-    name: string;
-  };
-  organizer: {
-    id: number;
-    name: string;
-    type: string;
-  };
-  location: {
-    id: number;
-    name: string;
-    address: string;
-    building?: string;
-    room?: string;
-  };
-  participationType: ParticipationType;
-  startDate: Date;
-  endDate: Date;
-  registrationLink?: string;
-  onlineLink?: string;
-  capacity: number;
-  registeredCount: number;
-  isFreeEntry: boolean;
-  requiresRegistration: boolean;
-  requiresTicket: boolean;
-  qrCode?: string;
-  status: {
-    id: number;
-    name: EventStatus;
-  };
+  registration_link?: string | null;
+  online_link?: string | null;
+  organizer: OrganizerEntity;
+  location: LocationEntity;
+  category: DescribedEntity;
+  participation_type: DescribedEntity;
+  status: DescribedEntity;
+  start_date: Date;
+  end_date: Date;
+  capacity?: number | null;
+  registration_deadline?: Date;
+  pricing_type?: string;
+  access_policy?: string;
+  is_free_entry: boolean;
+  requires_registration: boolean;
+  requires_ticket: boolean;
+  qr_code?: string | null;
+  max_files?: number | null;
+  max_file_size_mb?: number | null;
+  validated_by?: string | number | null;
+  validated_at?: Date;
+  created_at?: Date;
+  updated_at?: Date;
 };
-
-const eventData: EventItem[] = [
-  {
-    id: 1,
-    name: "Workshop React pentru studenți",
-    description:
-      "Sesiune practică despre componente, stare locală și integrarea cu API-ul aplicației UniEvents.",
-    faculty: { id: 1, name: "Inginerie Electrică și Știința Calculatoarelor" },
-    category: { id: 1, name: "Academic" },
-    organizer: { id: 1, name: "Tech Club USV", type: "Club Studențesc" },
-    location: {
-      id: 1,
-      name: "Sala A101",
-      address: "Campus Rectorat",
-      building: "A",
-      room: "101",
-    },
-    participationType: "Hibrid",
-    startDate: new Date(2026, 5, 25, 10, 0),
-    endDate: new Date(2026, 5, 25, 12, 0),
-    registrationLink: "https://unievents.usv.ro/register/react-workshop",
-    onlineLink: "https://meet.google.com/abc-defg-hij",
-    capacity: 60,
-    registeredCount: 41,
-    isFreeEntry: true,
-    requiresRegistration: true,
-    requiresTicket: false,
-    qrCode: "UE-REACT-2026-01",
-    status: { id: 1, name: "Active" },
-  },
-  {
-    id: 2,
-    name: "Conferință despre inteligență artificială",
-    description:
-      "Prezentări despre modele moderne, aplicații universitare și analiză de feedback.",
-    faculty: { id: 2, name: "Automatică și Calculatoare" },
-    category: { id: 2, name: "Cercetare" },
-    organizer: { id: 2, name: "AI Lab USV", type: "Laborator" },
-    location: {
-      id: 2,
-      name: "Aula Mare",
-      address: "Campus Rectorat",
-      building: "Aula",
-    },
-    participationType: "Fizic",
-    startDate: new Date(2026, 5, 26, 14, 0),
-    endDate: new Date(2026, 5, 26, 16, 30),
-    registrationLink: "https://unievents.usv.ro/register/ai-conference",
-    capacity: 180,
-    registeredCount: 142,
-    isFreeEntry: false,
-    requiresRegistration: true,
-    requiresTicket: true,
-    qrCode: "UE-AI-2026-02",
-    status: { id: 1, name: "Active" },
-  },
-  {
-    id: 3,
-    name: "Târg de voluntariat și carieră",
-    description:
-      "Organizații și companii locale prezintă oportunități de practică, voluntariat și internship.",
-    faculty: { id: 3, name: "Toate facultățile" },
-    category: { id: 3, name: "Carieră" },
-    organizer: { id: 3, name: "Asociația Studenților USV", type: "Asociație" },
-    location: { id: 3, name: "Holul principal", address: "Campus Rectorat" },
-    participationType: "Fizic",
-    startDate: new Date(2026, 6, 5, 9, 0),
-    endDate: new Date(2026, 6, 5, 17, 0),
-    registrationLink: "https://unievents.usv.ro/register/career-fair",
-    capacity: 300,
-    registeredCount: 198,
-    isFreeEntry: true,
-    requiresRegistration: false,
-    requiresTicket: false,
-    status: { id: 1, name: "Active" },
-  },
-  {
-    id: 4,
-    name: "Workshop de design și comunicare",
-    description:
-      "Activitate despre identitate vizuală, materiale publicate și colaborarea cu organizatorii.",
-    faculty: { id: 4, name: "Științe și Litere" },
-    category: { id: 4, name: "Voluntariat" },
-    organizer: { id: 4, name: "Design Club", type: "Club Studențesc" },
-    location: {
-      id: 4,
-      name: "Sala B205",
-      address: "Campus Rectorat",
-      building: "B",
-      room: "205",
-    },
-    participationType: "Online",
-    startDate: new Date(2026, 6, 28, 18, 0),
-    endDate: new Date(2026, 6, 28, 19, 30),
-    registrationLink: "https://unievents.usv.ro/register/design-workshop",
-    onlineLink: "https://meet.google.com/xyz-uvwx-yz",
-    capacity: 45,
-    registeredCount: 36,
-    isFreeEntry: true,
-    requiresRegistration: true,
-    requiresTicket: false,
-    status: { id: 1, name: "Active" },
-  },
-  {
-    id: 5,
-    name: "Hackathon interdisciplinar",
-    description:
-      "48 de ore de lucru pentru prototipuri, prezentări și validare în fața juriului.",
-    faculty: { id: 1, name: "Inginerie Electrică și Știința Calculatoarelor" },
-    category: { id: 5, name: "Competiție" },
-    organizer: {
-      id: 5,
-      name: "USV Innovation Hub",
-      type: "Centru de Inovație",
-    },
-    location: {
-      id: 5,
-      name: "Centrul de Inovație",
-      address: "Campus Rectorat",
-    },
-    participationType: "Hibrid",
-    startDate: new Date(2026, 7, 12, 9, 0),
-    endDate: new Date(2026, 7, 14, 18, 0),
-    registrationLink: "https://unievents.usv.ro/register/hackathon",
-    capacity: 120,
-    registeredCount: 96,
-    isFreeEntry: false,
-    requiresRegistration: true,
-    requiresTicket: true,
-    qrCode: "UE-HACK-2026-05",
-    status: { id: 1, name: "Active" },
-  },
-];
-
-const faculties = [
-  "Toate",
-  ...Array.from(new Set(eventData.map((e) => e.faculty.name))),
-];
-const categories = [
-  "Toate",
-  ...Array.from(new Set(eventData.map((e) => e.category.name))),
-];
-const locations = [
-  "Toate",
-  ...Array.from(new Set(eventData.map((e) => e.location.name))),
-];
-const organizers = [
-  "Toți",
-  ...Array.from(new Set(eventData.map((e) => e.organizer.name))),
-];
-const participations = [
-  "Toate",
-  ...Array.from(new Set(eventData.map((e) => e.participationType))),
-];
 
 const formatDateTime = (value: Date) =>
   new Intl.DateTimeFormat("ro-RO", {
@@ -244,8 +95,8 @@ const createIcsLink = (event: EventItem) => {
     `SUMMARY:${event.name}`,
     `DESCRIPTION:${event.description}`,
     `LOCATION:${locationStr}`,
-    `DTSTART:${toIcsStamp(event.startDate)}`,
-    `DTEND:${toIcsStamp(event.endDate)}`,
+    `DTSTART:${toIcsStamp(event.start_date)}`,
+    `DTEND:${toIcsStamp(event.end_date)}`,
     `UID:unievents-${event.id}@usv.ro`,
     "END:VEVENT",
     "END:VCALENDAR",
@@ -256,36 +107,203 @@ const createIcsLink = (event: EventItem) => {
 
 const toCalendarEvent = (event: EventItem) => ({
   ...event,
-  start: event.startDate,
-  end: event.endDate,
+  start: event.start_date,
+  end: event.end_date,
 });
+
+const withDescriptionTitle = (entity?: { description?: string | null }) =>
+  entity?.description ? { title: entity.description } : {};
+
+const formatOptionalDateTime = (value?: Date) =>
+  value ? formatDateTime(value) : "N/A";
+
+const formatPricingType = (value?: string) =>
+  value === "paid" ? "Plătit" : "Gratuit";
+
+const formatAccessPolicy = (value?: string) => {
+  switch (value) {
+    case "registration":
+      return "Necesită înscriere";
+    case "ticket":
+      return "Necesită bilet";
+    case "registration_ticket":
+      return "Necesită înscriere și bilet";
+    default:
+      return "Acces deschis";
+  }
+};
+
+const formatLinkText = (value: string) => {
+  try {
+    return new URL(value).hostname.replace(/^www\./, "");
+  } catch {
+    return value;
+  }
+};
 
 export const HomeComponent = () => {
   const [view, setView] = useState<View>(Views.MONTH);
   const [currentDate, setCurrentDate] = useState(() => new Date());
-  const [selectedFaculty, setSelectedFaculty] = useState("Toate");
   const [selectedCategory, setSelectedCategory] = useState("Toate");
   const [selectedLocation, setSelectedLocation] = useState("Toate");
   const [selectedOrganizer, setSelectedOrganizer] = useState("Toți");
   const [selectedParticipation, setSelectedParticipation] = useState("Toate");
   const [filterMode, setFilterMode] = useState<FilterMode>("and");
-  const [selectedEventId, setSelectedEventId] = useState<number | null>(
-    eventData[0].id,
-  );
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [categoriesList, setCategoriesList] = useState<DescribedEntity[]>([]);
+  const [locationsList, setLocationsList] = useState<
+    { id: number; name: string }[]
+  >([]);
+  const [organizersList, setOrganizersList] = useState<
+    { id: number; name: string }[]
+  >([]);
+  const [participationTypesList, setParticipationTypesList] = useState<
+    DescribedEntity[]
+  >([]);
+
+  const categories = ["Toate", ...categoriesList.map((c) => c.name)];
+  const locations = ["Toate", ...locationsList.map((l) => l.name)];
+  const organizers = ["Toți", ...organizersList.map((o) => o.name)];
+  const participations = [
+    "Toate",
+    ...participationTypesList.map((p) => p.name),
+  ];
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API}/api/events/`);
+        if (!res.ok) {
+          console.error("Failed to fetch events", res.status);
+          return;
+        }
+        const data = (await res.json()) as RawEventRecord[];
+        const normalizeEntity = (value: unknown, fallbackName = "N/A") =>
+          value && typeof value === "object"
+            ? value
+            : { id: value ?? 0, name: fallbackName };
+
+        const mapped: EventItem[] = data.map((e: RawEventRecord) => ({
+          id: Number(e.id ?? 0),
+          name: String(e.name ?? ""),
+          description: String(e.description ?? ""),
+          registration_link:
+            typeof e.registration_link === "string"
+              ? e.registration_link
+              : null,
+          online_link: typeof e.online_link === "string" ? e.online_link : null,
+          organizer: normalizeEntity(
+            e.organizer,
+            String(e.organizer_name ?? "N/A"),
+          ) as OrganizerEntity,
+          location:
+            e.location && typeof e.location === "object"
+              ? (e.location as LocationEntity)
+              : {
+                  id: Number(e.location ?? 0),
+                  name: String(e.location_name ?? "N/A"),
+                  address: String(e.location_address ?? "N/A"),
+                },
+          category: normalizeEntity(
+            e.category,
+            String(e.category_name ?? "N/A"),
+          ) as DescribedEntity,
+          participation_type: normalizeEntity(
+            e.participation_type,
+            String(e.participation_type_name ?? "N/A"),
+          ) as DescribedEntity,
+          status: normalizeEntity(
+            e.status,
+            String(e.status_name ?? "N/A"),
+          ) as DescribedEntity,
+          start_date: new Date(String(e.start_date)),
+          end_date: new Date(String(e.end_date)),
+          capacity: typeof e.capacity === "number" ? e.capacity : null,
+          registration_deadline: e.registration_deadline
+            ? new Date(String(e.registration_deadline))
+            : undefined,
+          pricing_type:
+            typeof e.pricing_type === "string" ? e.pricing_type : undefined,
+          access_policy:
+            typeof e.access_policy === "string" ? e.access_policy : undefined,
+          is_free_entry: Boolean(e.is_free_entry ?? true),
+          requires_registration: Boolean(e.requires_registration ?? false),
+          requires_ticket: Boolean(e.requires_ticket ?? false),
+          qr_code: typeof e.qr_code === "string" ? e.qr_code : null,
+          max_files: typeof e.max_files === "number" ? e.max_files : undefined,
+          max_file_size_mb:
+            typeof e.max_file_size_mb === "number"
+              ? e.max_file_size_mb
+              : undefined,
+          validated_by:
+            e.validated_by && typeof e.validated_by === "object"
+              ? ((e.validated_by as { username?: string }).username ??
+                undefined)
+              : typeof e.validated_by === "string" ||
+                  typeof e.validated_by === "number"
+                ? e.validated_by
+                : undefined,
+          validated_at: e.validated_at
+            ? new Date(String(e.validated_at))
+            : undefined,
+          created_at: e.created_at ? new Date(String(e.created_at)) : undefined,
+          updated_at: e.updated_at ? new Date(String(e.updated_at)) : undefined,
+        }));
+
+        setEvents(mapped);
+        if (mapped.length > 0) setSelectedEventId((id) => id ?? mapped[0].id);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  useEffect(() => {
+    const fetchLists = async () => {
+      try {
+        const base = import.meta.env.VITE_API;
+        const endpoints = [
+          `${base}/api/categories/`,
+          `${base}/api/locations/`,
+          `${base}/api/organizers/`,
+          `${base}/api/participation-types/`,
+        ];
+
+        const results = await Promise.all(
+          endpoints
+            .map((url) => fetch(url).then((r) => (r.ok ? r.json() : [])))
+            .map((p) => p.catch(() => [] as RawEventRecord[])),
+        );
+
+        const [cat, loc, org, part] = results;
+
+        setCategoriesList(Array.isArray(cat) ? cat : []);
+        setLocationsList(Array.isArray(loc) ? loc : []);
+        setOrganizersList(Array.isArray(org) ? org : []);
+        setParticipationTypesList(Array.isArray(part) ? part : []);
+      } catch (err) {
+        console.error("Failed to fetch filter lists", err);
+      }
+    };
+
+    fetchLists();
+  }, []);
 
   const filteredEvents = useMemo(() => {
-    return eventData.filter((event) => {
+    return events.filter((event) => {
       const checks = [
-        selectedFaculty === "Toate" || event.faculty.name === selectedFaculty,
         selectedCategory === "Toate" ||
-          event.category.name === selectedCategory,
+          event.category?.name === selectedCategory,
         selectedLocation === "Toate" ||
-          event.location.name === selectedLocation,
+          event.location?.name === selectedLocation,
         selectedOrganizer === "Toți" ||
-          event.organizer.name === selectedOrganizer,
+          event.organizer?.name === selectedOrganizer,
         selectedParticipation === "Toate" ||
-          event.participationType === selectedParticipation,
+          event.participation_type.name === selectedParticipation,
       ];
 
       return filterMode === "and"
@@ -295,10 +313,10 @@ export const HomeComponent = () => {
   }, [
     filterMode,
     selectedCategory,
-    selectedFaculty,
     selectedLocation,
     selectedOrganizer,
     selectedParticipation,
+    events,
   ]);
 
   const calendarEvents = useMemo(
@@ -306,8 +324,8 @@ export const HomeComponent = () => {
     [filteredEvents],
   );
   const selectedEvent = useMemo(
-    () => eventData.find((event) => event.id === selectedEventId) ?? null,
-    [selectedEventId],
+    () => events.find((event) => event.id === selectedEventId) ?? null,
+    [selectedEventId, events],
   );
 
   const openDetails = (event: EventItem) => {
@@ -336,19 +354,6 @@ export const HomeComponent = () => {
           </div>
 
           <div className="filter-stack">
-            <label>
-              Facultate
-              <select
-                value={selectedFaculty}
-                onChange={(event) => setSelectedFaculty(event.target.value)}
-              >
-                {faculties.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
             <label>
               Categorie
               <select
@@ -483,12 +488,12 @@ export const HomeComponent = () => {
               >
                 <div className="event-list-top">
                   <strong>{event.name}</strong>
-                  <span>{formatShortDate(event.startDate)}</span>
+                  <span>{formatShortDate(event.start_date)}</span>
                 </div>
                 <p>{event.location.name}</p>
                 <div className="event-list-bottom">
                   <span>{event.category.name}</span>
-                  <span>{event.participationType}</span>
+                  <span>{event.participation_type.name}</span>
                 </div>
               </button>
             ))}
@@ -564,64 +569,195 @@ export const HomeComponent = () => {
               </button>
             </div>
 
-            <p className="modal-description">{selectedEvent.description}</p>
-
-            <div className="modal-grid">
-              <div>
-                <span>Data și ora</span>
-                <strong>
-                  {formatDateTime(selectedEvent.startDate)} -{" "}
-                  {moment(selectedEvent.endDate).format("HH:mm")}
-                </strong>
-              </div>
-              <div>
-                <span>Locație</span>
-                <strong>
-                  {selectedEvent.location.name}
-                  {selectedEvent.location.room &&
-                    `, Sala ${selectedEvent.location.room}`}
-                </strong>
-              </div>
-              <div>
-                <span>Organizator</span>
-                <strong>{selectedEvent.organizer.name}</strong>
-              </div>
-              <div>
-                <span>Tip participare</span>
-                <strong>{selectedEvent.participationType}</strong>
-              </div>
-              <div>
-                <span>Facultate</span>
-                <strong>{selectedEvent.faculty.name}</strong>
-              </div>
-              <div>
-                <span>Locuri</span>
-                <strong>
-                  {selectedEvent.registeredCount}/{selectedEvent.capacity}
-                </strong>
-              </div>
+            <div className="modal-description-block">
+              <span className="modal-section-label">Descriere</span>
+              <p className="modal-description">{selectedEvent.description}</p>
             </div>
 
-            <div className="modal-tags">
-              <span>{selectedEvent.status.name}</span>
-              <span>
-                {selectedEvent.isFreeEntry
-                  ? "Intrare liberă"
-                  : "Taxă de participare"}
-              </span>
-              <span>
-                {selectedEvent.requiresRegistration
-                  ? "Necesită înscriere"
-                  : "Acces direct"}
-              </span>
-              <span>{selectedEvent.qrCode ? "Are cod QR" : "Fără cod QR"}</span>
+            <div className="modal-sections">
+              <section className="modal-card modal-card--wide">
+                <div className="modal-card-head">
+                  <div>
+                    <span className="modal-card-kicker">Perioadă</span>
+                    <h3>Intervalul evenimentului</h3>
+                  </div>
+                  <span className="modal-card-note">Când are loc</span>
+                </div>
+                <div className="modal-card-grid modal-card-grid--two">
+                  <div className="modal-field">
+                    <span>Începe</span>
+                    <strong>{formatDateTime(selectedEvent.start_date)}</strong>
+                  </div>
+                  <div className="modal-field">
+                    <span>Se termină</span>
+                    <strong>{formatDateTime(selectedEvent.end_date)}</strong>
+                  </div>
+                  <div className="modal-field">
+                    <span>Termen înscriere</span>
+                    <strong>
+                      {formatOptionalDateTime(
+                        selectedEvent.registration_deadline,
+                      )}
+                    </strong>
+                  </div>
+                </div>
+              </section>
+
+              <section className="modal-card">
+                <div className="modal-card-head">
+                  <div>
+                    <span className="modal-card-kicker">Unde</span>
+                    <h3>Locație și organizator</h3>
+                  </div>
+                </div>
+                <div className="modal-card-grid">
+                  <div
+                    className="modal-field"
+                    {...withDescriptionTitle(selectedEvent.location)}
+                  >
+                    <span>Locație</span>
+                    <strong>
+                      {selectedEvent.location.name}
+                      {selectedEvent.location.room &&
+                        `, Sala ${selectedEvent.location.room}`}
+                    </strong>
+                  </div>
+                  <div
+                    className="modal-field"
+                    {...withDescriptionTitle(selectedEvent.organizer)}
+                  >
+                    <span>Organizator</span>
+                    <strong>{selectedEvent.organizer.name}</strong>
+                  </div>
+                </div>
+              </section>
+
+              <section className="modal-card">
+                <div className="modal-card-head">
+                  <div>
+                    <span className="modal-card-kicker">Participare</span>
+                    <h3>Acces și tip eveniment</h3>
+                  </div>
+                </div>
+                <div className="modal-card-grid">
+                  <div
+                    className="modal-field"
+                    {...withDescriptionTitle(selectedEvent.category)}
+                  >
+                    <span>Categorie</span>
+                    <strong>{selectedEvent.category.name}</strong>
+                  </div>
+                  <div
+                    className="modal-field"
+                    {...withDescriptionTitle(selectedEvent.participation_type)}
+                  >
+                    <span>Tip participare</span>
+                    <strong>{selectedEvent.participation_type.name}</strong>
+                  </div>
+                  <div
+                    className="modal-field"
+                    {...withDescriptionTitle(selectedEvent.status)}
+                  >
+                    <span>Stare eveniment</span>
+                    <strong>{selectedEvent.status.name}</strong>
+                  </div>
+                  <div className="modal-field">
+                    <span>Capacitate</span>
+                    <strong>{selectedEvent.capacity ?? "N/A"}</strong>
+                  </div>
+                  <div className="modal-field">
+                    <span>Tip intrare</span>
+                    <strong>
+                      {formatPricingType(selectedEvent.pricing_type)}
+                    </strong>
+                  </div>
+                  <div className="modal-field">
+                    <span>Mod acces</span>
+                    <strong>
+                      {formatAccessPolicy(selectedEvent.access_policy)}
+                    </strong>
+                  </div>
+                  <div className="modal-field">
+                    <span>Cod QR</span>
+                    <strong>{selectedEvent.qr_code || "N/A"}</strong>
+                  </div>
+                </div>
+              </section>
+
+              <section className="modal-card">
+                <div className="modal-card-head">
+                  <div>
+                    <span className="modal-card-kicker">Linkuri</span>
+                    <h3>Acces rapid</h3>
+                  </div>
+                </div>
+                <div className="modal-card-grid">
+                  <div className="modal-field">
+                    <span>Înscriere</span>
+                    <strong>
+                      {selectedEvent.registration_link ? (
+                        <a
+                          className="modal-link"
+                          href={selectedEvent.registration_link}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {formatLinkText(selectedEvent.registration_link)}
+                        </a>
+                      ) : (
+                        "N/A"
+                      )}
+                    </strong>
+                  </div>
+                  <div className="modal-field">
+                    <span>Online</span>
+                    <strong>
+                      {selectedEvent.online_link ? (
+                        <a
+                          className="modal-link"
+                          href={selectedEvent.online_link}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {formatLinkText(selectedEvent.online_link)}
+                        </a>
+                      ) : (
+                        "N/A"
+                      )}
+                    </strong>
+                  </div>
+                </div>
+              </section>
+
+              <section className="modal-card modal-card--subtle">
+                <div className="modal-card-head">
+                  <div>
+                    <span className="modal-card-kicker">Istoric</span>
+                    <h3>Metadate</h3>
+                  </div>
+                </div>
+                <div className="modal-card-grid modal-card-grid--two">
+                  <div className="modal-field">
+                    <span>Creat la</span>
+                    <strong>
+                      {formatOptionalDateTime(selectedEvent.created_at)}
+                    </strong>
+                  </div>
+                  <div className="modal-field">
+                    <span>Actualizat la</span>
+                    <strong>
+                      {formatOptionalDateTime(selectedEvent.updated_at)}
+                    </strong>
+                  </div>
+                </div>
+              </section>
             </div>
 
             <div className="modal-actions">
-              {selectedEvent.registrationLink && (
+              {selectedEvent.registration_link && (
                 <a
                   className="modal-primary"
-                  href={selectedEvent.registrationLink}
+                  href={selectedEvent.registration_link}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -630,7 +766,7 @@ export const HomeComponent = () => {
               )}
               <a
                 className="modal-secondary"
-                href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(selectedEvent.name)}&dates=${moment(selectedEvent.startDate).format("YYYYMMDDTHHmmss")}/${moment(selectedEvent.endDate).format("YYYYMMDDTHHmmss")}&details=${encodeURIComponent(selectedEvent.description)}&location=${encodeURIComponent(selectedEvent.location.name)}`}
+                href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(selectedEvent.name)}&dates=${moment(selectedEvent.start_date).format("YYYYMMDDTHHmmss")}/${moment(selectedEvent.end_date).format("YYYYMMDDTHHmmss")}&details=${encodeURIComponent(selectedEvent.description)}&location=${encodeURIComponent(selectedEvent.location.name)}`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -643,29 +779,6 @@ export const HomeComponent = () => {
               >
                 Descarcă .ics
               </a>
-            </div>
-
-            <div className="modal-footer">
-              <div>
-                <strong>Cod QR</strong>
-                <p>{selectedEvent.qrCode || "N/A"}</p>
-              </div>
-              <div>
-                <strong>Tip bilet</strong>
-                <p>
-                  {selectedEvent.requiresTicket
-                    ? "Bilet obligatoriu"
-                    : "Fără bilet"}
-                </p>
-              </div>
-              <div>
-                <strong>Înscriți</strong>
-                <p>{selectedEvent.registeredCount} persoane</p>
-              </div>
-              <div>
-                <strong>Capacitate</strong>
-                <p>{selectedEvent.capacity} locuri</p>
-              </div>
             </div>
           </div>
         </div>

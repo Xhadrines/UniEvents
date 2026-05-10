@@ -34,6 +34,25 @@ class Event(BaseModel):
     capacity = models.PositiveIntegerField(null=True, blank=True)
     registration_deadline = models.DateTimeField(null=True, blank=True)
 
+    pricing_type = models.CharField(
+        max_length=10,
+        choices=[
+            ("free", "Gratuit"),
+            ("paid", "Platit"),
+        ],
+        default="free",
+    )
+    access_policy = models.CharField(
+        max_length=24,
+        choices=[
+            ("open", "Acces deschis"),
+            ("registration", "Necesita inscriere"),
+            ("ticket", "Necesita bilet"),
+            ("registration_ticket", "Necesita inscriere si bilet"),
+        ],
+        default="open",
+    )
+
     is_free_entry = models.BooleanField(default=True)
     requires_registration = models.BooleanField(default=False)
     requires_ticket = models.BooleanField(default=False)
