@@ -9,8 +9,6 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         context["endpoints"] = [
-            # Home
-            ("Home", "/api/"),
             # Authentication
             ("Register", "/api/register/"),
             ("Login", "/api/login/"),

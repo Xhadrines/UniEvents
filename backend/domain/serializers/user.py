@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
     # Serializer pentru tabela auth_user generata automat de Django
-    password = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=False, allow_blank=False)
 
     class Meta:
         model = User
@@ -32,6 +32,10 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Parola trebuie salvata criptat, nu direct in baza de date
         password = validated_data.pop("password")
+
+        if not password:
+            raise serializers.ValidationError({"password": "Password is required"})
+
         user = User(**validated_data)
         user.set_password(password)
         user.save()

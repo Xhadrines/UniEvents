@@ -28,13 +28,34 @@ class UserProfileService(BaseService):
         # Creeaza sau actualizeaza profilul utilizatorului
         profile = self.repository.get_by_user(user.id)
 
-        if profile:
-            profile = self.repository.partial_update(profile.id, **data)
-        else:
-            profile = self.repository.create(user=user, **data)
+        clean_data = data.copy()
+        clean_data.pop("token", None)
+        clean_data["user"] = user.id
 
-        serializer = UserProfileSerializer(profile)
-        return serializer.data
+        first_name = clean_data.pop("first_name", None)
+        last_name = clean_data.pop("last_name", None)
+
+        if first_name is not None:
+            user.first_name = first_name
+
+        if last_name is not None:
+            user.last_name = last_name
+
+        user.save()
+
+        if profile:
+            serializer = UserProfileSerializer(
+                profile,
+                data=clean_data,
+                partial=True,
+            )
+        else:
+            serializer = UserProfileSerializer(data=clean_data)
+
+        serializer.is_valid(raise_exception=True)
+        profile = serializer.save()
+
+        return UserProfileSerializer(profile).data
 
     def get_faculties_and_specializations(self):
         # Returneaza facultatile si specializarile pentru formularul de profil

@@ -1,3 +1,5 @@
+from rest_framework import serializers
+
 from ..models import UserProfile
 
 from .base_serializer import BaseSerializer
@@ -31,3 +33,19 @@ class UserProfileSerializer(BaseSerializer):
             "google_sub": {"required": False, "allow_null": True},
             "is_google_student": {"required": False},
         }
+
+    def validate(self, attrs):
+        specialization = attrs.get("specialization")
+        faculty = attrs.get("faculty")
+
+        if specialization:
+            if faculty and specialization.faculty_id != faculty.id:
+                raise serializers.ValidationError(
+                    {
+                        "specialization": "Specializarea nu apartine facultatii selectate."
+                    }
+                )
+
+            attrs["faculty"] = specialization.faculty
+
+        return attrs

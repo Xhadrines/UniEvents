@@ -29,7 +29,7 @@ class BaseCRUDView(APIView):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            obj = self.service.create(**serializer.validated_data)
+            obj = serializer.save()
 
             return Response(
                 self.serializer_class(obj).data,
@@ -38,39 +38,59 @@ class BaseCRUDView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, pk):
-        serializer = self.serializer_class(data=request.data)
+    def put(self, request, pk=None):
+        if pk is None:
+            return Response(
+                {"error": "ID is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        obj = self.service.get_by_id(pk)
+
+        if not obj:
+            return Response(
+                {"error": "Object not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = self.serializer_class(obj, data=request.data)
 
         if serializer.is_valid():
-            obj = self.service.update(pk, serializer.validated_data)
-
-            if not obj:
-                return Response(
-                    {"error": "Object not found"},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-
+            obj = serializer.save()
             return Response(self.serializer_class(obj).data)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def patch(self, request, pk):
-        serializer = self.serializer_class(data=request.data, partial=True)
+    def patch(self, request, pk=None):
+        if pk is None:
+            return Response(
+                {"error": "ID is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        obj = self.service.get_by_id(pk)
+
+        if not obj:
+            return Response(
+                {"error": "Object not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = self.serializer_class(obj, data=request.data, partial=True)
 
         if serializer.is_valid():
-            obj = self.service.partial_update(pk, serializer.validated_data)
-
-            if not obj:
-                return Response(
-                    {"error": "Object not found"},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-
+            obj = serializer.save()
             return Response(self.serializer_class(obj).data)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk):
+    def delete(self, request, pk=None):
+        if pk is None:
+            return Response(
+                {"error": "ID is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         deleted = self.service.delete(pk)
 
         if not deleted:
