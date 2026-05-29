@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Listă de așteptare - UniEvents</title>
+</head>
+<body style="margin:0; padding:0; background-color:#16171d; font-family:'Segoe UI', sans-serif; color:#f3f4f6;">
+  <div style="max-width:600px; margin:40px auto; padding:24px; background-color:#1e1e1e; border-radius:14px;">
+    <h1 style="color:#c084fc; text-align:center;">UniEvents ⏳</h1>
+
+    <p>Salut {{ username }},</p>
+
+    <p>
+      Te-ai înscris la evenimentul
+      <strong>{{ event.name }}</strong>,
+      însă toate locurile disponibile sunt ocupate momentan.
+    </p>
+
+    <p>
+      Ai fost adăugat în
+      <strong>lista de așteptare</strong>.
+    </p>
+
+    <p>
+      Dacă un participant își anulează înscrierea și se eliberează un loc,
+      vei fi mutat automat în lista participanților confirmați și vei primi
+      un nou email de confirmare.
+    </p>
+
+    <p>
+      <strong>Data evenimentului:</strong>
+      {{ event.start_date }}
+    </p>
+
+    <p>
+      <strong>Locație:</strong>
+      {{ event.location.name }}
+    </p>
+
+    <p style="margin-top:24px;">
+      Mulțumim că folosești UniEvents!
+    </p>
+  </div>
+</body>
+</html>

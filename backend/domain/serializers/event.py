@@ -18,6 +18,7 @@ class EventSerializer(BaseSerializer):
     status = StatusSerializer(read_only=True)
     faculty = FacultySerializer(read_only=True, source="organizer.faculty")
     registered_count = serializers.SerializerMethodField()
+    user_registration_status = serializers.SerializerMethodField()
     pricing_type_display = serializers.SerializerMethodField()
     access_policy_display = serializers.SerializerMethodField()
 
@@ -39,6 +40,7 @@ class EventSerializer(BaseSerializer):
             "end_date",
             "capacity",
             "registered_count",
+            "user_registration_status",
             "registration_deadline",
             "pricing_type",
             "access_policy",
@@ -126,3 +128,18 @@ class EventSerializer(BaseSerializer):
             return obj.registrations.count()
         except AttributeError:
             return 0
+
+    def get_user_registration_status(self, obj: Event):
+        request = self.context.get("request")
+
+        if not request or not request.user.is_authenticated:
+            return None
+
+        registration = (
+            obj.registrations.filter(user=request.user).select_related("status").first()
+        )
+
+        if not registration or not registration.status:
+            return None
+
+        return registration.status.name

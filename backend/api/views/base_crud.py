@@ -8,6 +8,9 @@ class BaseCRUDView(APIView):
     service = None
     serializer_class = None
 
+    def get_serializer_context(self, request):
+        return {"request": request}
+
     def get(self, request, pk=None):
         if pk:
             obj = self.service.get_by_id(pk)
@@ -18,21 +21,34 @@ class BaseCRUDView(APIView):
                     status=status.HTTP_404_NOT_FOUND,
                 )
 
-            serializer = self.serializer_class(obj)
+            serializer = self.serializer_class(
+                obj,
+                context=self.get_serializer_context(request),
+            )
             return Response(serializer.data)
 
         objs = self.service.get_all()
-        serializer = self.serializer_class(objs, many=True)
+        serializer = self.serializer_class(
+            objs,
+            many=True,
+            context=self.get_serializer_context(request),
+        )
         return Response(serializer.data)
 
     def post(self, request, pk=None):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(
+            data=request.data,
+            context=self.get_serializer_context(request),
+        )
 
         if serializer.is_valid():
             obj = serializer.save()
 
             return Response(
-                self.serializer_class(obj).data,
+                self.serializer_class(
+                    obj,
+                    context=self.get_serializer_context(request),
+                ).data,
                 status=status.HTTP_201_CREATED,
             )
 
@@ -53,11 +69,20 @@ class BaseCRUDView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        serializer = self.serializer_class(obj, data=request.data)
+        serializer = self.serializer_class(
+            obj,
+            data=request.data,
+            context=self.get_serializer_context(request),
+        )
 
         if serializer.is_valid():
             obj = serializer.save()
-            return Response(self.serializer_class(obj).data)
+            return Response(
+                self.serializer_class(
+                    obj,
+                    context=self.get_serializer_context(request),
+                ).data
+            )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -76,11 +101,21 @@ class BaseCRUDView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        serializer = self.serializer_class(obj, data=request.data, partial=True)
+        serializer = self.serializer_class(
+            obj,
+            data=request.data,
+            partial=True,
+            context=self.get_serializer_context(request),
+        )
 
         if serializer.is_valid():
             obj = serializer.save()
-            return Response(self.serializer_class(obj).data)
+            return Response(
+                self.serializer_class(
+                    obj,
+                    context=self.get_serializer_context(request),
+                ).data
+            )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

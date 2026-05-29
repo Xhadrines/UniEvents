@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmare înscriere - UniEvents</title>
+</head>
+<body style="margin:0; padding:0; background-color:#16171d; font-family:'Segoe UI', sans-serif; color:#f3f4f6;">
+  <div style="max-width:600px; margin:40px auto; padding:24px; background-color:#1e1e1e; border-radius:14px;">
+    <h1 style="color:#c084fc; text-align:center;">UniEvents 🎟️</h1>
+
+    <p>Salut {{ username }},</p>
+
+    {% if is_waiting_list %}
+      <p>
+        Te-ai înscris la evenimentul <strong>{{ event.name }}</strong>, dar locurile sunt ocupate momentan.
+      </p>
+      <p>
+        Ai fost adăugat în <strong>lista de așteptare</strong>. Dacă se eliberează un loc, înscrierea ta poate fi confirmată automat.
+      </p>
+    {% else %}
+      <p>
+        Înscrierea ta la evenimentul <strong>{{ event.name }}</strong> a fost confirmată cu succes.
+      </p>
+    {% endif %}
+
+    <p>
+      <strong>Data:</strong> {{ event.start_date }}<br>
+      <strong>Locație:</strong> {{ event.location.name }}
+    </p>
+
+    <p style="margin-top:24px;">
+      Mulțumim că folosești UniEvents!
+    </p>
+  </div>
+</body>
+</html>

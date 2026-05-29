@@ -25,14 +25,55 @@ class EmailService:
         msg.attach_alternative(html_content, "text/html")
         msg.send(fail_silently=False)
 
-    def send_registration_confirmation_email(self, user, event):
-        # Trimite confirmarea inscrierii la eveniment
-        subject = f"Registration confirmed - {event.name}"
+    def send_registration_confirmation_email(self, user, event, is_waiting_list=False):
+        subject = (
+            f"Lista de asteptare - {event.name}"
+            if is_waiting_list
+            else f"Confirmare inscriere - {event.name}"
+        )
+
         from_email = settings.EMAIL_HOST_USER
         to_email = [user.email]
 
         html_content = render_to_string(
             "emails/registration_confirmation_email.html",
+            {
+                "username": user.username,
+                "event": event,
+                "is_waiting_list": is_waiting_list,
+            },
+        )
+
+        msg = EmailMultiAlternatives(subject, "", from_email, to_email)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send(fail_silently=False)
+
+    def send_waiting_list_email(self, user, event):
+        subject = f"Lista de asteptare - {event.name}"
+
+        from_email = settings.EMAIL_HOST_USER
+        to_email = [user.email]
+
+        html_content = render_to_string(
+            "emails/waiting_list_email.html",
+            {
+                "username": user.username,
+                "event": event,
+            },
+        )
+
+        msg = EmailMultiAlternatives(subject, "", from_email, to_email)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send(fail_silently=False)
+
+    def send_registration_cancelled_email(self, user, event):
+        subject = f"Inscriere anulata - {event.name}"
+
+        from_email = settings.EMAIL_HOST_USER
+        to_email = [user.email]
+
+        html_content = render_to_string(
+            "emails/registration_cancelled_email.html",
             {
                 "username": user.username,
                 "event": event,

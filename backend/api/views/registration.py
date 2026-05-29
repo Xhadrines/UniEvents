@@ -28,15 +28,26 @@ class RegisterToEventView(APIView):
             )
 
         accepted_status = status_service.get_by_name("Acceptat")
+        waiting_status = status_service.get_by_name("Lista de asteptare")
 
         try:
-            registration = registration_service.register_user_to_event(
+            registration, is_waiting_list = registration_service.register_user_to_event(
                 user=request.user,
                 event=event,
-                status=accepted_status,
+                accepted_status=accepted_status,
+                waiting_status=waiting_status,
             )
 
-            email_service.send_registration_confirmation_email(request.user, event)
+            if is_waiting_list:
+                email_service.send_waiting_list_email(
+                    request.user,
+                    event,
+                )
+            else:
+                email_service.send_registration_confirmation_email(
+                    request.user,
+                    event,
+                )
 
             return Response(
                 RegistrationSerializer(registration).data,
@@ -56,11 +67,14 @@ class CancelRegistrationView(APIView):
         status_service = StatusService()
 
         cancelled_status = status_service.get_by_name("Anulat")
+        accepted_status = status_service.get_by_name("Acceptat")
+        email_service = EmailService()
 
-        registration = service.cancel_registration(
+        registration, promoted_registration = service.cancel_registration(
             user_id=request.user.id,
             event_id=event_id,
             cancelled_status=cancelled_status,
+            accepted_status=accepted_status,
         )
 
         if not registration:
@@ -68,6 +82,18 @@ class CancelRegistrationView(APIView):
                 {"error": "Registration not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+        if promoted_registration:
+            email_service.send_registration_confirmation_email(
+                promoted_registration.user,
+                promoted_registration.event,
+                is_waiting_list=False,
+            )
+
+        email_service.send_registration_cancelled_email(
+            request.user,
+            registration.event,
+        )
 
         return Response(RegistrationSerializer(registration).data)
 

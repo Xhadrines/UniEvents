@@ -16,7 +16,11 @@ class UpcomingEventsView(APIView):
     def get(self, request):
         service = EventService()
         events = service.get_upcoming_events()
-        serializer = EventSerializer(events, many=True)
+        serializer = EventSerializer(
+            events,
+            many=True,
+            context={"request": request},
+        )
         return Response(serializer.data)
 
 
@@ -39,7 +43,12 @@ class ValidateEventView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        return Response(EventSerializer(event).data)
+        return Response(
+            EventSerializer(
+                event,
+                context={"request": request},
+            ).data
+        )
 
 
 class CancelEventView(APIView):
@@ -56,4 +65,9 @@ class CancelEventView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        return Response(EventSerializer(event).data)
+        return Response(
+            EventSerializer(
+                event,
+                context={"request": request},
+            ).data
+        )

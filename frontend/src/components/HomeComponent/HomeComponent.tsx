@@ -60,6 +60,8 @@ type EventItem = {
   status: DescribedEntity;
   start_date: Date;
   end_date: Date;
+  registered_count?: number;
+  user_registration_status?: string | null;
   capacity?: number | null;
   registration_deadline?: Date;
   pricing_type?: string;
@@ -205,6 +207,8 @@ export const HomeComponent = () => {
   const [feedbackComment, setFeedbackComment] = useState("");
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [registrationLoading, setRegistrationLoading] = useState(false);
+  const [registrationMessage, setRegistrationMessage] = useState("");
 
   const categories = ["Toate", ...categoriesList.map((c) => c.name)];
   const locations = ["Toate", ...locationsList.map((l) => l.name)];
@@ -313,7 +317,16 @@ export const HomeComponent = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API}/api/events/`);
+        const token = localStorage.getItem("access");
+
+        const res = await fetch(`${import.meta.env.VITE_API}/api/events/`, {
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : {},
+        });
+
         if (!res.ok) {
           console.error("Failed to fetch events", res.status);
           return;
@@ -360,6 +373,12 @@ export const HomeComponent = () => {
           start_date: new Date(String(e.start_date)),
           end_date: new Date(String(e.end_date)),
           capacity: typeof e.capacity === "number" ? e.capacity : null,
+          registered_count:
+            typeof e.registered_count === "number" ? e.registered_count : 0,
+          user_registration_status:
+            typeof e.user_registration_status === "string"
+              ? e.user_registration_status
+              : null,
           registration_deadline: e.registration_deadline
             ? new Date(String(e.registration_deadline))
             : undefined,
@@ -536,6 +555,11 @@ export const HomeComponent = () => {
         feedbacks.length
       : 0;
 
+  const isRegistered = selectedEvent?.user_registration_status === "Acceptat";
+
+  const isWaiting =
+    selectedEvent?.user_registration_status === "Lista de asteptare";
+
   const openDetails = (event: EventItem) => {
     setSelectedEventId(event.id);
     setModalOpen(true);
@@ -610,6 +634,111 @@ export const HomeComponent = () => {
       setFeedbackMessage("A apărut o eroare la trimiterea feedback-ului.");
     } finally {
       setFeedbackLoading(false);
+    }
+  };
+
+  const registerToEvent = async () => {
+    if (!selectedEvent) return;
+
+    setRegistrationLoading(true);
+    setRegistrationMessage("");
+
+    try {
+      const token = localStorage.getItem("access");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API}/api/events/${selectedEvent.id}/register/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const data = await res.json();
+
+      const newStatus = data.status_name;
+
+      if (!res.ok) {
+        setRegistrationMessage(
+          data.error || "Nu s-a putut realiza înscrierea.",
+        );
+        return;
+      }
+
+      const updatedEvents = events.map((event) => {
+        if (event.id !== selectedEvent.id) return event;
+
+        return {
+          ...event,
+          user_registration_status: newStatus,
+          registered_count:
+            newStatus === "Acceptat"
+              ? (event.registered_count ?? 0) + 1
+              : event.registered_count,
+        };
+      });
+
+      setEvents(updatedEvents);
+
+      setRegistrationMessage(
+        newStatus === "Lista de asteptare"
+          ? "Ai fost adăugat în lista de așteptare."
+          : "Înscriere realizată cu succes.",
+      );
+    } catch (err) {
+      console.error(err);
+      setRegistrationMessage("A apărut o eroare.");
+    } finally {
+      setRegistrationLoading(false);
+    }
+  };
+
+  const cancelRegistration = async () => {
+    if (!selectedEvent) return;
+
+    setRegistrationLoading(true);
+    setRegistrationMessage("");
+
+    try {
+      const token = localStorage.getItem("access");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API}/api/events/${selectedEvent.id}/cancel-registration/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setRegistrationMessage(data.error || "Nu s-a putut anula înscrierea.");
+        return;
+      }
+
+      const updatedEvents = events.map((event) => {
+        if (event.id !== selectedEvent.id) return event;
+
+        return {
+          ...event,
+          user_registration_status: "Anulat",
+          registered_count: Math.max((event.registered_count ?? 1) - 1, 0),
+        };
+      });
+
+      setEvents(updatedEvents);
+
+      setRegistrationMessage("Înscriere anulată.");
+    } catch (err) {
+      console.error(err);
+      setRegistrationMessage("A apărut o eroare.");
+    } finally {
+      setRegistrationLoading(false);
     }
   };
 
@@ -977,6 +1106,57 @@ export const HomeComponent = () => {
                     </strong>
                   </div>
                 </div>
+                <div className="event-registration">
+                  <div className="event-registration-info">
+                    <strong>
+                      {selectedEvent.registered_count ?? 0}
+                      {selectedEvent.capacity
+                        ? ` / ${selectedEvent.capacity}`
+                        : ""}{" "}
+                      participanți
+                    </strong>
+
+                    {isRegistered && (
+                      <span className="registration-status confirmed">
+                        Înscris
+                      </span>
+                    )}
+
+                    {isWaiting && (
+                      <span className="registration-status waiting">
+                        Lista de așteptare
+                      </span>
+                    )}
+                  </div>
+
+                  {registrationMessage && (
+                    <p className="registration-message">
+                      {registrationMessage}
+                    </p>
+                  )}
+
+                  {isRegistered || isWaiting ? (
+                    <button
+                      type="button"
+                      className="registration-button cancel"
+                      disabled={registrationLoading}
+                      onClick={cancelRegistration}
+                    >
+                      {registrationLoading
+                        ? "Se procesează..."
+                        : "Renunță la înscriere"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="registration-button"
+                      disabled={registrationLoading}
+                      onClick={registerToEvent}
+                    >
+                      {registrationLoading ? "Se procesează..." : "Înscrie-te"}
+                    </button>
+                  )}
+                </div>
               </section>
 
               <section className="modal-card">
@@ -1251,7 +1431,7 @@ export const HomeComponent = () => {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Înscriere
+                  Website eveniment
                 </a>
               )}
               <a
