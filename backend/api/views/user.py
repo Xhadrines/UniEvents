@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .base_crud import BaseCRUDView
 from ..services import UserService
@@ -50,6 +51,12 @@ class LoginView(APIView):
                 username_or_email=request.data.get("username_or_email"),
                 password=request.data.get("password"),
             )
+
+            user = user_service.get_by_id(data["user_id"])
+            refresh = RefreshToken.for_user(user)
+
+            data["refresh"] = str(refresh)
+            data["access"] = str(refresh.access_token)
 
             return Response(data, status=status.HTTP_200_OK)
 

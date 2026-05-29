@@ -22,7 +22,7 @@ from .registration import (
     CancelRegistrationView,
     CheckInView,
 )
-from .feedback import FeedbackView, AddFeedbackView
+from .feedback import FeedbackView, AddFeedbackView, EventFeedbackListView
 from .event_material import (
     EventMaterialView,
     EventMaterialsByEventView,

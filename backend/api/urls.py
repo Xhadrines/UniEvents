@@ -31,6 +31,7 @@ from .views import (
     CheckInView,
     FeedbackView,
     AddFeedbackView,
+    EventFeedbackListView,
     MaterialTypeView,
     EventMaterialView,
     EventMaterialsByEventView,
@@ -141,6 +142,11 @@ urlpatterns = [
         "events/<int:event_id>/feedback/",
         AddFeedbackView.as_view(),
         name="event-feedback",
+    ),
+    path(
+        "events/<int:event_id>/feedbacks/",
+        EventFeedbackListView.as_view(),
+        name="event-feedback-list",
     ),
     path("material-types/", MaterialTypeView.as_view(), name="material-type"),
     path(

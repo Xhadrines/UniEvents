@@ -75,6 +75,17 @@ type EventItem = {
   updated_at?: Date;
 };
 
+type FeedbackItem = {
+  id: number;
+  user?: number;
+  username?: string;
+  event?: number;
+  rating: number;
+  comment: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
 const formatDateTime = (value: Date) =>
   new Intl.DateTimeFormat("ro-RO", {
     dateStyle: "full",
@@ -187,6 +198,11 @@ export const HomeComponent = () => {
   >([]);
   const [activeFilter, setActiveFilter] = useState<FilterKey | null>(null);
   const [filterSearch, setFilterSearch] = useState("");
+  const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
+  const [feedbackRating, setFeedbackRating] = useState(5);
+  const [feedbackComment, setFeedbackComment] = useState("");
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
 
   const categories = ["Toate", ...categoriesList.map((c) => c.name)];
   const locations = ["Toate", ...locationsList.map((l) => l.name)];
@@ -471,12 +487,92 @@ export const HomeComponent = () => {
     [selectedEventId, events],
   );
 
+  const canLeaveFeedback = selectedEvent
+    ? new Date() >= selectedEvent.end_date
+    : false;
+
+  const averageRating =
+    feedbacks.length > 0
+      ? feedbacks.reduce((sum, feedback) => sum + feedback.rating, 0) /
+        feedbacks.length
+      : 0;
+
   const openDetails = (event: EventItem) => {
     setSelectedEventId(event.id);
     setModalOpen(true);
   };
 
   const closeDetails = () => setModalOpen(false);
+
+  const fetchFeedbacks = async (eventId: number) => {
+    try {
+      const token = localStorage.getItem("access");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API}/api/events/${eventId}/feedbacks/`,
+        {
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : {},
+        },
+      );
+
+      if (!res.ok) {
+        console.error("Failed to fetch feedbacks", res.status);
+        return;
+      }
+
+      const data = (await res.json()) as FeedbackItem[];
+      setFeedbacks(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const submitFeedback = async () => {
+    if (!selectedEvent) return;
+
+    setFeedbackLoading(true);
+    setFeedbackMessage("");
+
+    try {
+      const token = localStorage.getItem("access");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API}/api/events/${selectedEvent.id}/feedback/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            rating: feedbackRating,
+            comment: feedbackComment.trim(),
+          }),
+        },
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setFeedbackMessage(data.error || "Nu s-a putut trimite feedback-ul.");
+        return;
+      }
+
+      setFeedbackMessage("Feedback trimis cu succes.");
+      setFeedbackComment("");
+      setFeedbackRating(5);
+      await fetchFeedbacks(selectedEvent.id);
+    } catch (err) {
+      console.error(err);
+      setFeedbackMessage("A apărut o eroare la trimiterea feedback-ului.");
+    } finally {
+      setFeedbackLoading(false);
+    }
+  };
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -489,6 +585,15 @@ export const HomeComponent = () => {
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, []);
+
+  useEffect(() => {
+    if (!modalOpen || !selectedEvent) return;
+
+    fetchFeedbacks(selectedEvent.id);
+    setFeedbackMessage("");
+    setFeedbackComment("");
+    setFeedbackRating(5);
+  }, [modalOpen, selectedEvent]);
 
   return (
     <main className="home-shell">
@@ -967,6 +1072,98 @@ export const HomeComponent = () => {
                       )}
                     </strong>
                   </div>
+                </div>
+              </section>
+
+              <section className="modal-card feedback-card">
+                <div className="modal-card-head">
+                  <div>
+                    <span className="modal-card-kicker">Feedback</span>
+                    <h3>Rating și comentarii</h3>
+                  </div>
+
+                  <span className="modal-card-note">
+                    {feedbacks.length > 0
+                      ? `${averageRating.toFixed(1)} / 5 din ${feedbacks.length} review-uri`
+                      : "Fără review-uri"}
+                  </span>
+                </div>
+
+                {canLeaveFeedback ? (
+                  <div className="feedback-form">
+                    <div className="feedback-stars">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          className={
+                            star <= feedbackRating
+                              ? "feedback-star active"
+                              : "feedback-star"
+                          }
+                          onClick={() => setFeedbackRating(star)}
+                        >
+                          ★
+                        </button>
+                      ))}
+                    </div>
+
+                    <textarea
+                      className="feedback-textarea"
+                      value={feedbackComment}
+                      onChange={(event) =>
+                        setFeedbackComment(event.target.value)
+                      }
+                      placeholder="Scrie părerea ta despre eveniment..."
+                      rows={4}
+                    />
+
+                    {feedbackMessage && (
+                      <p className="feedback-message">{feedbackMessage}</p>
+                    )}
+
+                    <button
+                      type="button"
+                      className="feedback-submit"
+                      onClick={submitFeedback}
+                      disabled={feedbackLoading}
+                    >
+                      {feedbackLoading ? "Se trimite..." : "Trimite feedback"}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="feedback-unavailable">
+                    Feedback-ul poate fi oferit doar după finalizarea
+                    evenimentului.
+                  </p>
+                )}
+
+                <div className="feedback-list">
+                  {feedbacks.length > 0 ? (
+                    feedbacks.map((feedback) => (
+                      <article key={feedback.id} className="feedback-item">
+                        <div className="feedback-item-header">
+                          <strong>{feedback.username || "Utilizator"}</strong>
+                          <span>{"★".repeat(feedback.rating)}</span>
+                        </div>
+
+                        {feedback.comment && <p>{feedback.comment}</p>}
+
+                        {feedback.created_at && (
+                          <small>
+                            {new Intl.DateTimeFormat("ro-RO", {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            }).format(new Date(feedback.created_at))}
+                          </small>
+                        )}
+                      </article>
+                    ))
+                  ) : (
+                    <p className="feedback-empty">
+                      Nu există feedback pentru acest eveniment încă.
+                    </p>
+                  )}
                 </div>
               </section>
 

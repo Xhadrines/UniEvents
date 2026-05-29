@@ -708,3 +708,122 @@
   border-radius: 14px;
   margin-top: 8px;
 }
+
+.feedback-card {
+  background:
+    radial-gradient(circle at top right, var(--accent-bg), transparent 38%),
+    rgba(255, 255, 255, 0.02);
+}
+
+.feedback-form {
+  display: grid;
+  gap: 12px;
+}
+
+.feedback-stars {
+  display: flex;
+  gap: 6px;
+}
+
+.feedback-star {
+  border: none;
+  background: transparent;
+  color: var(--text);
+  opacity: 0.45;
+  font-size: 1.7rem;
+  cursor: pointer;
+  padding: 0;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    color 0.18s ease;
+}
+
+.feedback-star:hover,
+.feedback-star.active {
+  opacity: 1;
+  color: #f5b301;
+  transform: translateY(-1px);
+}
+
+.feedback-textarea {
+  width: 100%;
+  resize: vertical;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  padding: 12px 14px;
+  font: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.feedback-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.feedback-submit {
+  justify-self: flex-start;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.feedback-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.feedback-message,
+.feedback-unavailable,
+.feedback-empty {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.feedback-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.feedback-item {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.feedback-item-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.feedback-item-header strong {
+  color: var(--text-h);
+}
+
+.feedback-item-header span {
+  color: #f5b301;
+  letter-spacing: 0.04em;
+}
+
+.feedback-item p {
+  margin: 10px 0;
+  color: var(--text-h);
+  line-height: 1.6;
+}
+
+.feedback-item small {
+  color: var(--text);
+  opacity: 0.72;
+}

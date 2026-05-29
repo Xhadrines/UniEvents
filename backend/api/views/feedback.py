@@ -43,3 +43,12 @@ class AddFeedbackView(APIView):
                 {"error": str(error)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class EventFeedbackListView(APIView):
+    def get(self, request, event_id):
+        feedback_service = FeedbackService()
+        feedbacks = feedback_service.get_by_event(event_id).order_by("-created_at")
+
+        serializer = FeedbackSerializer(feedbacks, many=True)
+        return Response(serializer.data)
