@@ -142,6 +142,20 @@ const formatLinkText = (value: string) => {
   }
 };
 
+const getMediaUrl = (value?: string | null) => {
+  if (!value) return "";
+
+  if (value.startsWith("http")) {
+    return value;
+  }
+
+  if (value.startsWith("/media/")) {
+    return `${import.meta.env.VITE_API}${value}`;
+  }
+
+  return `${import.meta.env.VITE_API}/media/${value}`;
+};
+
 export const HomeComponent = () => {
   const [view, setView] = useState<View>(Views.MONTH);
   const [currentDate, setCurrentDate] = useState(() => new Date());
@@ -792,9 +806,31 @@ export const HomeComponent = () => {
                       {formatAccessPolicy(selectedEvent.access_policy)}
                     </strong>
                   </div>
-                  <div className="modal-field">
+                  <div className="modal-field modal-field--qr">
                     <span>Cod QR</span>
-                    <strong>{selectedEvent.qr_code || "N/A"}</strong>
+                    {selectedEvent.qr_code ? (
+                      <>
+                        {console.log("QR RAW:", selectedEvent.qr_code)}
+                        {console.log(
+                          "QR URL:",
+                          getMediaUrl(selectedEvent.qr_code),
+                        )}
+
+                        <a
+                          href={getMediaUrl(selectedEvent.qr_code)}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <img
+                            className="event-qr-code"
+                            src={getMediaUrl(selectedEvent.qr_code)}
+                            alt={`QR ${selectedEvent.name}`}
+                          />
+                        </a>
+                      </>
+                    ) : (
+                      <strong>N/A</strong>
+                    )}
                   </div>
                 </div>
               </section>

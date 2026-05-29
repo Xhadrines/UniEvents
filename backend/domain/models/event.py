@@ -1,5 +1,11 @@
+from fileinput import filename
+
 from django.db import models
 from django.contrib.auth.models import User
+
+from io import BytesIO
+from django.core.files.base import ContentFile
+import qrcode
 
 from .base_model import BaseModel
 from .organizer import Organizer
@@ -7,6 +13,10 @@ from .location import Location
 from .category import Category
 from .participation_type import ParticipationType
 from .status import Status
+
+
+def event_qr_upload_path(instance, filename):
+    return f"events/{instance.id}/qr_codes/{filename}"
 
 
 class Event(BaseModel):
@@ -57,7 +67,11 @@ class Event(BaseModel):
     requires_registration = models.BooleanField(default=False)
     requires_ticket = models.BooleanField(default=False)
 
-    qr_code = models.ImageField(upload_to="events/qr_codes/", null=True, blank=True)
+    qr_code = models.ImageField(
+        upload_to=event_qr_upload_path,
+        null=True,
+        blank=True,
+    )
 
     max_files = models.PositiveIntegerField(null=True, blank=True)
     max_file_size_mb = models.PositiveIntegerField(null=True, blank=True)
@@ -70,6 +84,19 @@ class Event(BaseModel):
         related_name="validated_events",
     )
     validated_at = models.DateTimeField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if not self.qr_code and self.registration_link:
+            qr = qrcode.make(self.registration_link)
+            buffer = BytesIO()
+            qr.save(buffer, format="PNG")
+
+            filename = f"event_{self.id}_qr.png"
+            self.qr_code.save(filename, ContentFile(buffer.getvalue()), save=False)
+
+            super().save(update_fields=["qr_code"])
 
     def __str__(self) -> str:
         return f"{self.name}"
