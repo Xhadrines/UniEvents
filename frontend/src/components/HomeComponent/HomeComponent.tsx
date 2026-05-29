@@ -25,7 +25,8 @@ type FilterKey =
   | "organizer"
   | "participation"
   | "date"
-  | "extra";
+  | "extra"
+  | "sort";
 
 type DescribedEntity = {
   id: number;
@@ -182,6 +183,7 @@ export const HomeComponent = () => {
   const [selectedParticipation, setSelectedParticipation] = useState("Toate");
   const [selectedDateFilter, setSelectedDateFilter] = useState("Toate");
   const [selectedExtraFilter, setSelectedExtraFilter] = useState("Toate");
+  const [sortOption, setSortOption] = useState("Data apropiată");
   const [filterMode, setFilterMode] = useState<FilterMode>("and");
   const [events, setEvents] = useState<EventItem[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
@@ -217,6 +219,12 @@ export const HomeComponent = () => {
     "Intrare liberă",
     "Necesită înscriere",
     "Are cod QR",
+  ];
+  const sortOptions = [
+    "Data apropiată",
+    "Data îndepărtată",
+    "Alfabetic A-Z",
+    "Alfabetic Z-A",
   ];
 
   const filterConfigs: Record<
@@ -270,6 +278,13 @@ export const HomeComponent = () => {
       value: selectedExtraFilter,
       options: extraFilters,
       onSelect: setSelectedExtraFilter,
+    },
+    sort: {
+      title: "Alege sortarea",
+      label: "Sortare",
+      value: sortOption,
+      options: sortOptions,
+      onSelect: setSortOption,
     },
   };
 
@@ -478,10 +493,34 @@ export const HomeComponent = () => {
     events,
   ]);
 
+  const sortedEvents = useMemo(() => {
+    const sorted = [...filteredEvents];
+
+    switch (sortOption) {
+      case "Data îndepărtată":
+        sorted.sort((a, b) => b.start_date.getTime() - a.start_date.getTime());
+        break;
+
+      case "Alfabetic A-Z":
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+
+      case "Alfabetic Z-A":
+        sorted.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+
+      default:
+        sorted.sort((a, b) => a.start_date.getTime() - b.start_date.getTime());
+    }
+
+    return sorted;
+  }, [filteredEvents, sortOption]);
+
   const calendarEvents = useMemo(
-    () => filteredEvents.map(toCalendarEvent),
-    [filteredEvents],
+    () => sortedEvents.map(toCalendarEvent),
+    [sortedEvents],
   );
+
   const selectedEvent = useMemo(
     () => events.find((event) => event.id === selectedEventId) ?? null,
     [selectedEventId, events],
@@ -679,6 +718,19 @@ export const HomeComponent = () => {
               </button>
             </div>
 
+            <div className="filter-picker-field">
+              <span>Sortare</span>
+
+              <button
+                type="button"
+                className="filter-picker-button"
+                onClick={() => openFilterModal("sort")}
+              >
+                <span>{sortOption}</span>
+                <span aria-hidden="true">⌄</span>
+              </button>
+            </div>
+
             <div className="filter-mode-row">
               <span>Combinare</span>
               <div className="mode-buttons">
@@ -741,11 +793,11 @@ export const HomeComponent = () => {
         <div className="sidebar-section sidebar-list">
           <div className="sidebar-section-head">
             <h2>Lista evenimentelor</h2>
-            <span>{filteredEvents.length} rezultate</span>
+            <span>{sortedEvents.length} rezultate</span>
           </div>
 
           <div className="event-list">
-            {filteredEvents.map((event) => (
+            {sortedEvents.map((event) => (
               <button
                 key={event.id}
                 type="button"
