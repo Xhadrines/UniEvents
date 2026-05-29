@@ -19,7 +19,13 @@ moment.locale("ro", {
 const localizer = momentLocalizer(moment);
 
 type FilterMode = "and" | "or";
-type FilterKey = "category" | "location" | "organizer" | "participation";
+type FilterKey =
+  | "category"
+  | "location"
+  | "organizer"
+  | "participation"
+  | "date"
+  | "extra";
 
 type DescribedEntity = {
   id: number;
@@ -163,6 +169,8 @@ export const HomeComponent = () => {
   const [selectedLocation, setSelectedLocation] = useState("Toate");
   const [selectedOrganizer, setSelectedOrganizer] = useState("Toți");
   const [selectedParticipation, setSelectedParticipation] = useState("Toate");
+  const [selectedDateFilter, setSelectedDateFilter] = useState("Toate");
+  const [selectedExtraFilter, setSelectedExtraFilter] = useState("Toate");
   const [filterMode, setFilterMode] = useState<FilterMode>("and");
   const [events, setEvents] = useState<EventItem[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
@@ -186,6 +194,13 @@ export const HomeComponent = () => {
   const participations = [
     "Toate",
     ...participationTypesList.map((p) => p.name),
+  ];
+  const dateFilters = ["Toate", "Azi", "Săptămâna aceasta", "Luna aceasta"];
+  const extraFilters = [
+    "Toate",
+    "Intrare liberă",
+    "Necesită înscriere",
+    "Are cod QR",
   ];
 
   const filterConfigs: Record<
@@ -225,6 +240,20 @@ export const HomeComponent = () => {
       value: selectedParticipation,
       options: participations,
       onSelect: setSelectedParticipation,
+    },
+    date: {
+      title: "Alege perioada",
+      label: "Perioada",
+      value: selectedDateFilter,
+      options: dateFilters,
+      onSelect: setSelectedDateFilter,
+    },
+    extra: {
+      title: "Alege filtrul suplimentar",
+      label: "Filtru suplimentar",
+      value: selectedExtraFilter,
+      options: extraFilters,
+      onSelect: setSelectedExtraFilter,
     },
   };
 
@@ -374,6 +403,37 @@ export const HomeComponent = () => {
 
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {
+      const now = new Date();
+
+      const isToday = event.start_date.toDateString() === now.toDateString();
+
+      const startOfWeek = moment().startOf("week");
+      const endOfWeek = moment().endOf("week");
+
+      const isThisWeek = moment(event.start_date).isBetween(
+        startOfWeek,
+        endOfWeek,
+        undefined,
+        "[]",
+      );
+
+      const isThisMonth =
+        event.start_date.getMonth() === now.getMonth() &&
+        event.start_date.getFullYear() === now.getFullYear();
+
+      const matchesDate =
+        selectedDateFilter === "Toate" ||
+        (selectedDateFilter === "Azi" && isToday) ||
+        (selectedDateFilter === "Săptămâna aceasta" && isThisWeek) ||
+        (selectedDateFilter === "Luna aceasta" && isThisMonth);
+
+      const matchesExtra =
+        selectedExtraFilter === "Toate" ||
+        (selectedExtraFilter === "Intrare liberă" && event.is_free_entry) ||
+        (selectedExtraFilter === "Necesită înscriere" &&
+          event.requires_registration) ||
+        (selectedExtraFilter === "Are cod QR" && Boolean(event.qr_code));
+
       const checks = [
         selectedCategory === "Toate" ||
           event.category?.name === selectedCategory,
@@ -383,6 +443,8 @@ export const HomeComponent = () => {
           event.organizer?.name === selectedOrganizer,
         selectedParticipation === "Toate" ||
           event.participation_type.name === selectedParticipation,
+        matchesDate,
+        matchesExtra,
       ];
 
       return filterMode === "and"
@@ -395,6 +457,8 @@ export const HomeComponent = () => {
     selectedLocation,
     selectedOrganizer,
     selectedParticipation,
+    selectedDateFilter,
+    selectedExtraFilter,
     events,
   ]);
 
@@ -480,6 +544,32 @@ export const HomeComponent = () => {
                 onClick={() => openFilterModal("participation")}
               >
                 <span>{selectedParticipation}</span>
+                <span aria-hidden="true">⌄</span>
+              </button>
+            </div>
+
+            <div className="filter-picker-field">
+              <span>Perioada</span>
+
+              <button
+                type="button"
+                className="filter-picker-button"
+                onClick={() => openFilterModal("date")}
+              >
+                <span>{selectedDateFilter}</span>
+                <span aria-hidden="true">⌄</span>
+              </button>
+            </div>
+
+            <div className="filter-picker-field">
+              <span>Filtru suplimentar</span>
+
+              <button
+                type="button"
+                className="filter-picker-button"
+                onClick={() => openFilterModal("extra")}
+              >
+                <span>{selectedExtraFilter}</span>
                 <span aria-hidden="true">⌄</span>
               </button>
             </div>
