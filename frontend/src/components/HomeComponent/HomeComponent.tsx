@@ -90,6 +90,15 @@ type FeedbackItem = {
   updated_at?: string;
 };
 
+type EventMaterial = {
+  id: number;
+  title: string;
+  file?: string | null;
+  is_public?: boolean;
+  material_type?: DescribedEntity;
+  created_at?: string;
+};
+
 const formatDateTime = (value: Date) =>
   new Intl.DateTimeFormat("ro-RO", {
     dateStyle: "full",
@@ -215,6 +224,8 @@ export const HomeComponent = () => {
   );
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [favoriteMessage, setFavoriteMessage] = useState("");
+
+  const [eventMaterials, setEventMaterials] = useState<EventMaterial[]>([]);
 
   const categories = ["Toate", ...categoriesList.map((c) => c.name)];
   const locations = ["Toate", ...locationsList.map((l) => l.name)];
@@ -639,6 +650,34 @@ export const HomeComponent = () => {
     }
   };
 
+  const fetchEventMaterials = async (eventId: number) => {
+    try {
+      const token = localStorage.getItem("access");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API}/api/events/${eventId}/materials/`,
+        {
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : {},
+        },
+      );
+
+      if (!res.ok) {
+        setEventMaterials([]);
+        return;
+      }
+
+      const data = (await res.json()) as EventMaterial[];
+
+      setEventMaterials(data.filter((material) => material.is_public));
+    } catch {
+      setEventMaterials([]);
+    }
+  };
+
   const submitFeedback = async () => {
     if (!selectedEvent) return;
 
@@ -855,6 +894,7 @@ export const HomeComponent = () => {
     if (!modalOpen || !selectedEvent) return;
 
     fetchFeedbacks(selectedEvent.id);
+    fetchEventMaterials(selectedEvent.id);
     setFeedbackMessage("");
     setFeedbackComment("");
     setFeedbackRating(5);
@@ -1422,6 +1462,57 @@ export const HomeComponent = () => {
                       )}
                     </strong>
                   </div>
+                </div>
+              </section>
+
+              <section className="modal-card">
+                <div className="modal-card-head">
+                  <div>
+                    <span className="modal-card-kicker">Materiale</span>
+                    <h3>Fișiere disponibile</h3>
+                  </div>
+                </div>
+
+                <div className="event-material-list">
+                  {eventMaterials.length > 0 ? (
+                    eventMaterials.map((material) => {
+                      const fileName = material.file
+                        ? material.file.split("/").pop()
+                        : "Fișier";
+
+                      const fileUrl = getMediaUrl(material.file);
+
+                      return (
+                        <article
+                          key={material.id}
+                          className="event-material-card"
+                        >
+                          <div>
+                            <strong>{material.title}</strong>
+                            <span>
+                              {material.material_type?.name || "Tip necunoscut"}
+                            </span>
+                          </div>
+
+                          {fileUrl && (
+                            <a
+                              className="event-material-download"
+                              href={fileUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              download
+                            >
+                              Descarcă: {fileName}
+                            </a>
+                          )}
+                        </article>
+                      );
+                    })
+                  ) : (
+                    <p className="event-material-empty">
+                      Nu există materiale publice pentru acest eveniment.
+                    </p>
+                  )}
                 </div>
               </section>
 

@@ -18,6 +18,20 @@ type SponsorEntity = {
   description?: string | null;
   link?: string | null;
 };
+type EventSponsorLink = {
+  id: number;
+  event?: number | { id?: number };
+  sponsor?: number | SponsorEntity | { id?: number };
+};
+type MaterialEntity = {
+  id: number;
+  title: string;
+  file?: string | null;
+  is_public?: boolean;
+  material_type?: DescribedEntity;
+  uploaded_by?: DescribedEntity | null;
+  created_at?: string;
+};
 type RegistrationItem = {
   id: number;
   user?:
@@ -34,6 +48,10 @@ type RegistrationItem = {
   status?: DescribedEntity;
   status_name?: string;
   created_at?: string;
+};
+
+type RegistrationWithEvent = RegistrationItem & {
+  event?: number | { id?: number };
 };
 
 type EventItem = {
@@ -57,6 +75,8 @@ type EventItem = {
   is_free_entry?: boolean;
   requires_registration?: boolean;
   requires_ticket?: boolean;
+  max_files?: number | null;
+  max_file_size_mb?: number | null;
   qr_code?: string | null;
   created_at?: string;
   updated_at?: string;
@@ -74,12 +94,25 @@ type EventForm = {
   status_id: string;
   start_date: string;
   end_date: string;
+  start_time: string;
+  end_time: string;
   capacity: string;
   registration_deadline: string;
+  registration_deadline_time: string;
   pricing_type: "free" | "paid";
   access_policy: "open" | "registration" | "ticket" | "registration_ticket";
+  is_free_entry: boolean;
+  requires_registration: boolean;
+  requires_ticket: boolean;
   max_files: string;
   max_file_size_mb: string;
+};
+
+type MaterialForm = {
+  title: string;
+  material_type_id: string;
+  file: File | null;
+  is_public: boolean;
 };
 
 const emptyForm: EventForm = {
@@ -94,15 +127,67 @@ const emptyForm: EventForm = {
   status_id: "",
   start_date: "",
   end_date: "",
+  start_time: "",
+  end_time: "",
   capacity: "",
   registration_deadline: "",
+  registration_deadline_time: "",
   pricing_type: "free",
   access_policy: "open",
+  is_free_entry: true,
+  requires_registration: false,
+  requires_ticket: false,
   max_files: "",
   max_file_size_mb: "",
 };
 
-const authHeaders = () => {
+const EVENT_EDITABLE_FIELDS = [
+  "name",
+  "description",
+  "registration_link",
+  "online_link",
+  "location_id",
+  "category_id",
+  "participation_type_id",
+  "start_date",
+  "end_date",
+  "capacity",
+  "registration_deadline",
+  "pricing_type",
+  "is_free_entry",
+  "requires_registration",
+  "requires_ticket",
+  "max_files",
+  "max_file_size_mb",
+] as const;
+
+const EVENT_READONLY_FIELDS = [
+  "organizer",
+  "status",
+  "access_policy",
+  "qr_code",
+  "validated_by",
+  "validated_at",
+  "created_at",
+  "updated_at",
+] as const;
+
+const emptyMaterialForm: MaterialForm = {
+  title: "",
+  material_type_id: "",
+  file: null,
+  is_public: true,
+};
+
+const deriveAccessPolicy = (form: EventForm) => {
+  if (form.requires_registration && form.requires_ticket)
+    return "registration_ticket";
+  if (form.requires_registration) return "registration";
+  if (form.requires_ticket) return "ticket";
+  return "open";
+};
+
+const authHeaders = (): Record<string, string> => {
   const token = localStorage.getItem("access");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
@@ -117,6 +202,22 @@ const toDateTimeLocal = (value?: string | null) => {
   return offsetDate.toISOString().slice(0, 16);
 };
 
+const splitDateTime = (value?: string | null) => {
+  if (!value) {
+    return {
+      date: "",
+      time: "",
+    };
+  }
+
+  const local = toDateTimeLocal(value);
+
+  return {
+    date: local.slice(0, 10),
+    time: local.slice(11, 16),
+  };
+};
+
 const formatDateTime = (value?: string | null) => {
   if (!value) return "N/A";
   return new Intl.DateTimeFormat("ro-RO", {
@@ -124,6 +225,9 @@ const formatDateTime = (value?: string | null) => {
     timeStyle: "short",
   }).format(new Date(value));
 };
+
+const isRejectedEvent = (event?: EventItem | null) =>
+  event?.status?.name?.toLowerCase().includes("respins");
 
 const currentUserId = () => {
   try {
@@ -151,14 +255,17 @@ export const OrganizerDashboard = () => {
   const [participationTypes, setParticipationTypes] = useState<
     DescribedEntity[]
   >([]);
-  const [statuses, setStatuses] = useState<DescribedEntity[]>([]);
+  const [materialTypes, setMaterialTypes] = useState<DescribedEntity[]>([]);
   const [sponsors, setSponsors] = useState<SponsorEntity[]>([]);
-  const [eventSponsors, setEventSponsors] = useState<any[]>([]);
+  const [eventSponsors, setEventSponsors] = useState<EventSponsorLink[]>([]);
   const [registrations, setRegistrations] = useState<RegistrationItem[]>([]);
+  const [eventMaterials, setEventMaterials] = useState<MaterialEntity[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [mode, setMode] = useState<"list" | "create" | "edit" | "view">("list");
   const modalOpen = mode === "create" || mode === "edit" || mode === "view";
   const [form, setForm] = useState<EventForm>(emptyForm);
+  const [materialForm, setMaterialForm] =
+    useState<MaterialForm>(emptyMaterialForm);
   const [selectedSponsorIds, setSelectedSponsorIds] = useState<number[]>([]);
   const [sponsorSearch, setSponsorSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -181,11 +288,15 @@ export const OrganizerDashboard = () => {
   const selectedEventSponsors = useMemo(() => {
     if (!selectedEvent) return [];
     return eventSponsors
-      .filter(
-        (item) => Number(item.event?.id ?? item.event) === selectedEvent.id,
-      )
+      .filter((item) => {
+        const linkedEvent =
+          typeof item.event === "object" && item.event
+            ? item.event.id
+            : item.event;
+        return Number(linkedEvent) === selectedEvent.id;
+      })
       .map((item) =>
-        item.sponsor && typeof item.sponsor === "object"
+        typeof item.sponsor === "object" && item.sponsor
           ? item.sponsor
           : sponsors.find((s) => s.id === Number(item.sponsor)),
       )
@@ -202,6 +313,20 @@ export const OrganizerDashboard = () => {
     );
   }, [sponsors, sponsorSearch]);
 
+  const loadEventMaterials = async (eventId: number) => {
+    try {
+      const base = import.meta.env.VITE_API;
+      const response = await fetch(`${base}/api/events/${eventId}/materials/`, {
+        headers: authHeaders(),
+      });
+      const data = response.ok ? await response.json() : [];
+      setEventMaterials(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error(error);
+      setEventMaterials([]);
+    }
+  };
+
   const loadData = async () => {
     setLoading(true);
     setMessage("");
@@ -214,7 +339,7 @@ export const OrganizerDashboard = () => {
         locationsData,
         categoriesData,
         participationData,
-        statusesData,
+        materialTypesData,
         sponsorsData,
         eventSponsorsData,
       ] = await Promise.all([
@@ -233,7 +358,7 @@ export const OrganizerDashboard = () => {
         fetch(`${base}/api/participation-types/`, { headers }).then((r) =>
           r.ok ? r.json() : [],
         ),
-        fetch(`${base}/api/statuses/`, { headers }).then((r) =>
+        fetch(`${base}/api/material-types/`, { headers }).then((r) =>
           r.ok ? r.json() : [],
         ),
         fetch(`${base}/api/sponsors/`, { headers }).then((r) =>
@@ -250,7 +375,9 @@ export const OrganizerDashboard = () => {
       setParticipationTypes(
         Array.isArray(participationData) ? participationData : [],
       );
-      setStatuses(Array.isArray(statusesData) ? statusesData : []);
+      setMaterialTypes(
+        Array.isArray(materialTypesData) ? materialTypesData : [],
+      );
       setSponsors(Array.isArray(sponsorsData) ? sponsorsData : []);
       setEventSponsors(
         Array.isArray(eventSponsorsData) ? eventSponsorsData : [],
@@ -298,13 +425,20 @@ export const OrganizerDashboard = () => {
       category_id: String(event.category?.id ?? ""),
       participation_type_id: String(event.participation_type?.id ?? ""),
       status_id: String(event.status?.id ?? ""),
-      start_date: toDateTimeLocal(event.start_date),
-      end_date: toDateTimeLocal(event.end_date),
+      start_date: splitDateTime(event.start_date).date,
+      start_time: splitDateTime(event.start_date).time,
+      end_date: splitDateTime(event.end_date).date,
+      end_time: splitDateTime(event.end_date).time,
       capacity: event.capacity ? String(event.capacity) : "",
-      registration_deadline: toDateTimeLocal(event.registration_deadline),
+      registration_deadline: splitDateTime(event.registration_deadline).date,
+      registration_deadline_time: splitDateTime(event.registration_deadline)
+        .time,
       pricing_type: event.pricing_type === "paid" ? "paid" : "free",
       access_policy:
         (event.access_policy as EventForm["access_policy"]) ?? "open",
+      is_free_entry: Boolean(event.is_free_entry ?? true),
+      requires_registration: Boolean(event.requires_registration ?? false),
+      requires_ticket: Boolean(event.requires_ticket ?? false),
       max_files: event.max_files ? String(event.max_files) : "",
       max_file_size_mb: event.max_file_size_mb
         ? String(event.max_file_size_mb)
@@ -312,8 +446,20 @@ export const OrganizerDashboard = () => {
     });
     setSelectedSponsorIds(
       eventSponsors
-        .filter((item) => Number(item.event?.id ?? item.event) === event.id)
-        .map((item) => Number(item.sponsor?.id ?? item.sponsor))
+        .filter((item) => {
+          const linkedEvent =
+            typeof item.event === "object" && item.event
+              ? item.event.id
+              : item.event;
+          return Number(linkedEvent) === event.id;
+        })
+        .map((item) =>
+          Number(
+            typeof item.sponsor === "object" && item.sponsor
+              ? item.sponsor.id
+              : item.sponsor,
+          ),
+        )
         .filter(Boolean),
     );
     setMode("edit");
@@ -331,15 +477,22 @@ export const OrganizerDashboard = () => {
       const list = Array.isArray(data) ? data : [];
       setRegistrations(
         list.filter(
-          (reg: any) => Number(reg.event?.id ?? reg.event) === event.id,
+          (reg: RegistrationWithEvent) =>
+            Number(
+              typeof reg.event === "object" && reg.event
+                ? reg.event.id
+                : reg.event,
+            ) === event.id,
         ),
       );
+      await loadEventMaterials(event.id);
     } catch {
       setRegistrations([]);
+      setEventMaterials([]);
     }
   };
 
-  const changeForm = (field: keyof EventForm, value: string) =>
+  const changeForm = (field: keyof EventForm, value: string | boolean) =>
     setForm((previous) => ({ ...previous, [field]: value }));
 
   const payloadFromForm = () => ({
@@ -351,20 +504,34 @@ export const OrganizerDashboard = () => {
     location_id: Number(form.location_id),
     category_id: Number(form.category_id),
     participation_type_id: Number(form.participation_type_id),
-    start_date: new Date(form.start_date).toISOString(),
-    end_date: new Date(form.end_date).toISOString(),
+    start_date: new Date(`${form.start_date}T${form.start_time}`).toISOString(),
+    end_date: new Date(`${form.end_date}T${form.end_time}`).toISOString(),
     capacity: form.capacity ? Number(form.capacity) : null,
-    registration_deadline: form.registration_deadline
-      ? new Date(form.registration_deadline).toISOString()
-      : null,
+    registration_deadline:
+      form.registration_deadline && form.registration_deadline_time
+        ? new Date(
+            `${form.registration_deadline}T${form.registration_deadline_time}`,
+          ).toISOString()
+        : null,
     pricing_type: form.pricing_type,
-    access_policy: form.access_policy,
+    is_free_entry: form.is_free_entry,
+    requires_registration: form.requires_registration,
+    requires_ticket: form.requires_ticket,
+    access_policy: deriveAccessPolicy(form),
+    max_files: form.max_files ? Number(form.max_files) : null,
+    max_file_size_mb: form.max_file_size_mb
+      ? Number(form.max_file_size_mb)
+      : null,
   });
 
   const syncSponsors = async (eventId: number) => {
-    const currentLinks = eventSponsors.filter(
-      (item) => Number(item.event?.id ?? item.event) === eventId,
-    );
+    const currentLinks = eventSponsors.filter((item) => {
+      const linkedEvent =
+        typeof item.event === "object" && item.event
+          ? item.event.id
+          : item.event;
+      return Number(linkedEvent) === eventId;
+    });
     await Promise.all(
       currentLinks.map((item) =>
         fetch(`${import.meta.env.VITE_API}/api/event-sponsors/${item.id}/`, {
@@ -434,11 +601,111 @@ export const OrganizerDashboard = () => {
     );
   };
 
+  const changeMaterialForm = <K extends keyof MaterialForm>(
+    field: K,
+    value: MaterialForm[K],
+  ) => setMaterialForm((previous) => ({ ...previous, [field]: value }));
+
+  const updateMaterialVisibility = async (
+    material: MaterialEntity,
+    isPublic: boolean,
+  ) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API}/api/event-materials/${material.id}/`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...authHeaders(),
+          },
+          body: JSON.stringify({ is_public: isPublic }),
+        },
+      );
+
+      if (!response.ok) {
+        setMessage("Nu s-a putut modifica vizibilitatea materialului.");
+        return;
+      }
+
+      if (selectedEvent) {
+        await loadEventMaterials(selectedEvent.id);
+      }
+    } catch {
+      setMessage("A apărut o eroare la modificarea vizibilității.");
+    }
+  };
+
+  const uploadMaterial = async () => {
+    if (!selectedEvent || !materialForm.file) return;
+
+    if (isRejectedEvent(selectedEvent)) {
+      setMessage("Evenimentul respins nu permite încărcarea materialelor.");
+      return;
+    }
+
+    if (
+      selectedEvent.max_files !== null &&
+      selectedEvent.max_files !== undefined &&
+      eventMaterials.length >= selectedEvent.max_files
+    ) {
+      setMessage("Evenimentul a atins numărul maxim de fișiere permis.");
+      return;
+    }
+
+    if (
+      selectedEvent.max_file_size_mb !== null &&
+      selectedEvent.max_file_size_mb !== undefined
+    ) {
+      const maxBytes = selectedEvent.max_file_size_mb * 1024 * 1024;
+      if (materialForm.file.size > maxBytes) {
+        setMessage(
+          `Fișierul depășește limita de ${selectedEvent.max_file_size_mb} MB.`,
+        );
+        return;
+      }
+    }
+
+    try {
+      setMessage("");
+      const base = import.meta.env.VITE_API;
+      const body = new FormData();
+      body.append("title", materialForm.title);
+      body.append("material_type", materialForm.material_type_id);
+      body.append("file", materialForm.file);
+      body.append("is_public", materialForm.is_public ? "True" : "False");
+
+      const response = await fetch(
+        `${base}/api/events/${selectedEvent.id}/materials/upload/`,
+        {
+          method: "POST",
+          headers: authHeaders(),
+          body,
+        },
+      );
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setMessage(data.error || "Nu s-a putut încărca materialul.");
+        return;
+      }
+
+      setMessage("Materialul a fost încărcat.");
+      setMaterialForm(emptyMaterialForm);
+      await loadEventMaterials(selectedEvent.id);
+    } catch (error) {
+      console.error(error);
+      setMessage("Nu s-a putut încărca materialul.");
+    }
+  };
+
   const closeModal = () => {
     setMode("list");
     setSelectedEvent(null);
     setRegistrations([]);
+    setEventMaterials([]);
     setSelectedSponsorIds([]);
+    setMaterialForm(emptyMaterialForm);
   };
 
   return (
@@ -531,29 +798,65 @@ export const OrganizerDashboard = () => {
                 </div>
 
                 <div className="dashboard-form-grid">
-                  <label>
-                    Nume
+                  <label className="full">
+                    Nume eveniment
                     <input
                       value={form.name}
                       onChange={(e) => changeForm("name", e.target.value)}
                     />
                   </label>
+
+                  <label className="full">
+                    Descriere
+                    <textarea
+                      rows={5}
+                      value={form.description}
+                      onChange={(e) =>
+                        changeForm("description", e.target.value)
+                      }
+                    />
+                  </label>
+
                   <label>
-                    Începe
+                    Data început
                     <input
-                      type="datetime-local"
+                      type="date"
+                      lang="ro"
                       value={form.start_date}
                       onChange={(e) => changeForm("start_date", e.target.value)}
                     />
                   </label>
+
                   <label>
-                    Se termină
+                    Ora început
                     <input
-                      type="datetime-local"
+                      type="time"
+                      step="300"
+                      value={form.start_time}
+                      onChange={(e) => changeForm("start_time", e.target.value)}
+                    />
+                  </label>
+
+                  <label>
+                    Data final
+                    <input
+                      type="date"
+                      lang="ro"
                       value={form.end_date}
                       onChange={(e) => changeForm("end_date", e.target.value)}
                     />
                   </label>
+
+                  <label>
+                    Ora final
+                    <input
+                      type="time"
+                      step="300"
+                      value={form.end_time}
+                      onChange={(e) => changeForm("end_time", e.target.value)}
+                    />
+                  </label>
+
                   <label>
                     Locație
                     <select
@@ -570,6 +873,7 @@ export const OrganizerDashboard = () => {
                       ))}
                     </select>
                   </label>
+
                   <label>
                     Categorie
                     <select
@@ -586,6 +890,7 @@ export const OrganizerDashboard = () => {
                       ))}
                     </select>
                   </label>
+
                   <label>
                     Participare
                     <select
@@ -602,6 +907,7 @@ export const OrganizerDashboard = () => {
                       ))}
                     </select>
                   </label>
+
                   <label>
                     Capacitate
                     <input
@@ -610,16 +916,53 @@ export const OrganizerDashboard = () => {
                       onChange={(e) => changeForm("capacity", e.target.value)}
                     />
                   </label>
+
                   <label>
-                    Termen înscriere
+                    Număr maxim fișiere
                     <input
-                      type="datetime-local"
+                      type="number"
+                      min="0"
+                      value={form.max_files}
+                      onChange={(e) => changeForm("max_files", e.target.value)}
+                    />
+                  </label>
+
+                  <label>
+                    Dimensiune maximă fișier MB
+                    <input
+                      type="number"
+                      min="0"
+                      value={form.max_file_size_mb}
+                      onChange={(e) =>
+                        changeForm("max_file_size_mb", e.target.value)
+                      }
+                    />
+                  </label>
+
+                  <label>
+                    Data limită înscriere
+                    <input
+                      type="date"
+                      lang="ro"
                       value={form.registration_deadline}
                       onChange={(e) =>
                         changeForm("registration_deadline", e.target.value)
                       }
                     />
                   </label>
+
+                  <label>
+                    Ora limită înscriere
+                    <input
+                      type="time"
+                      step="300"
+                      value={form.registration_deadline_time}
+                      onChange={(e) =>
+                        changeForm("registration_deadline_time", e.target.value)
+                      }
+                    />
+                  </label>
+
                   <label>
                     Tip preț
                     <select
@@ -632,22 +975,49 @@ export const OrganizerDashboard = () => {
                       <option value="paid">Plătit</option>
                     </select>
                   </label>
+
                   <label>
-                    Acces
+                    Intrare gratuită
                     <select
-                      value={form.access_policy}
+                      value={String(form.is_free_entry)}
                       onChange={(e) =>
-                        changeForm("access_policy", e.target.value)
+                        changeForm("is_free_entry", e.target.value === "true")
                       }
                     >
-                      <option value="open">Acces deschis</option>
-                      <option value="registration">Necesită înscriere</option>
-                      <option value="ticket">Necesită bilet</option>
-                      <option value="registration_ticket">
-                        Înscriere și bilet
-                      </option>
+                      <option value="true">Da</option>
+                      <option value="false">Nu</option>
                     </select>
                   </label>
+
+                  <label>
+                    Necesită înscriere
+                    <select
+                      value={String(form.requires_registration)}
+                      onChange={(e) =>
+                        changeForm(
+                          "requires_registration",
+                          e.target.value === "true",
+                        )
+                      }
+                    >
+                      <option value="false">Nu</option>
+                      <option value="true">Da</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Necesită bilet
+                    <select
+                      value={String(form.requires_ticket)}
+                      onChange={(e) =>
+                        changeForm("requires_ticket", e.target.value === "true")
+                      }
+                    >
+                      <option value="false">Nu</option>
+                      <option value="true">Da</option>
+                    </select>
+                  </label>
+
                   <label>
                     Link înscriere
                     <input
@@ -657,6 +1027,7 @@ export const OrganizerDashboard = () => {
                       }
                     />
                   </label>
+
                   <label>
                     Link online
                     <input
@@ -666,16 +1037,34 @@ export const OrganizerDashboard = () => {
                       }
                     />
                   </label>
-                  <label className="full">
-                    Descriere
-                    <textarea
-                      rows={5}
-                      value={form.description}
-                      onChange={(e) =>
-                        changeForm("description", e.target.value)
-                      }
-                    />
-                  </label>
+                </div>
+
+                <div className="dashboard-details-grid dashboard-subsection">
+                  <div>
+                    <span>Organizator</span>
+                    <strong>
+                      {myOrganizers.find(
+                        (organizer) =>
+                          String(organizer.id) === form.organizer_id,
+                      )?.name || "Se completează automat"}
+                    </strong>
+                  </div>
+                  <div>
+                    <span>Status</span>
+                    <strong>În așteptare</strong>
+                  </div>
+                  <div>
+                    <span>Politică acces</span>
+                    <strong>
+                      {deriveAccessPolicy(form) === "registration_ticket"
+                        ? "Necesită înscriere și bilet"
+                        : deriveAccessPolicy(form) === "registration"
+                          ? "Necesită înscriere"
+                          : deriveAccessPolicy(form) === "ticket"
+                            ? "Necesită bilet"
+                            : "Acces deschis"}
+                    </strong>
+                  </div>
                 </div>
 
                 <div className="sponsor-picker">
@@ -757,34 +1146,160 @@ export const OrganizerDashboard = () => {
                   </button>
                 </div>
                 <div className="dashboard-details-grid">
-                  <div>
+                  <div className="full">
                     <span>Descriere</span>
-                    <strong>{selectedEvent.description}</strong>
+                    <strong>{selectedEvent.description || "N/A"}</strong>
                   </div>
+
                   <div>
-                    <span>Perioadă</span>
-                    <strong>
-                      {formatDateTime(selectedEvent.start_date)} -{" "}
-                      {formatDateTime(selectedEvent.end_date)}
-                    </strong>
+                    <span>Începe</span>
+                    <strong>{formatDateTime(selectedEvent.start_date)}</strong>
                   </div>
+
+                  <div>
+                    <span>Se termină</span>
+                    <strong>{formatDateTime(selectedEvent.end_date)}</strong>
+                  </div>
+
                   <div>
                     <span>Locație</span>
-                    <strong>{selectedEvent.location?.name}</strong>
+                    <strong>
+                      {selectedEvent.location?.name || "N/A"}
+                      {selectedEvent.location?.address
+                        ? `, ${selectedEvent.location.address}`
+                        : ""}
+                      {selectedEvent.location?.building
+                        ? `, Corp ${selectedEvent.location.building}`
+                        : ""}
+                      {selectedEvent.location?.room
+                        ? `, Sala ${selectedEvent.location.room}`
+                        : ""}
+                    </strong>
                   </div>
+
+                  <div>
+                    <span>Organizator</span>
+                    <strong>{selectedEvent.organizer?.name || "N/A"}</strong>
+                  </div>
+
                   <div>
                     <span>Categorie</span>
-                    <strong>{selectedEvent.category?.name}</strong>
+                    <strong>{selectedEvent.category?.name || "N/A"}</strong>
                   </div>
+
                   <div>
                     <span>Participare</span>
-                    <strong>{selectedEvent.participation_type?.name}</strong>
+                    <strong>
+                      {selectedEvent.participation_type?.name || "N/A"}
+                    </strong>
                   </div>
+
                   <div>
                     <span>Status</span>
-                    <strong>{selectedEvent.status?.name}</strong>
+                    <strong>{selectedEvent.status?.name || "N/A"}</strong>
                   </div>
+
                   <div>
+                    <span>Capacitate</span>
+                    <strong>
+                      {selectedEvent.registered_count ?? 0}
+                      {selectedEvent.capacity
+                        ? ` / ${selectedEvent.capacity}`
+                        : " / Nelimitat"}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Număr maxim fișiere</span>
+                    <strong>{selectedEvent.max_files ?? "Nelimitat"}</strong>
+                  </div>
+
+                  <div>
+                    <span>Dimensiune maximă fișier</span>
+                    <strong>
+                      {selectedEvent.max_file_size_mb
+                        ? `${selectedEvent.max_file_size_mb} MB`
+                        : "Fără limită"}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Termen înscriere</span>
+                    <strong>
+                      {formatDateTime(selectedEvent.registration_deadline)}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Tip preț</span>
+                    <strong>
+                      {selectedEvent.pricing_type === "paid"
+                        ? "Plătit"
+                        : "Gratuit"}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Intrare gratuită</span>
+                    <strong>{selectedEvent.is_free_entry ? "Da" : "Nu"}</strong>
+                  </div>
+
+                  <div>
+                    <span>Necesită înscriere</span>
+                    <strong>
+                      {selectedEvent.requires_registration ? "Da" : "Nu"}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Necesită bilet</span>
+                    <strong>
+                      {selectedEvent.requires_ticket ? "Da" : "Nu"}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Politică acces</span>
+                    <strong>{selectedEvent.access_policy || "N/A"}</strong>
+                  </div>
+
+                  <div>
+                    <span>Link înscriere</span>
+                    <strong>{selectedEvent.registration_link || "N/A"}</strong>
+                  </div>
+
+                  <div>
+                    <span>Link online</span>
+                    <strong>{selectedEvent.online_link || "N/A"}</strong>
+                  </div>
+
+                  <div>
+                    <span>Cod QR</span>
+                    <strong>
+                      {selectedEvent.qr_code ? "Disponibil" : "N/A"}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Limite fișiere</span>
+                    <strong>
+                      {selectedEvent.max_files ?? "Nelimitat"} fișiere,{" "}
+                      {selectedEvent.max_file_size_mb ?? "fără limită"} MB /
+                      fișier
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Creat la</span>
+                    <strong>{formatDateTime(selectedEvent.created_at)}</strong>
+                  </div>
+
+                  <div>
+                    <span>Actualizat la</span>
+                    <strong>{formatDateTime(selectedEvent.updated_at)}</strong>
+                  </div>
+
+                  <div className="full">
                     <span>Sponsori</span>
                     <strong>
                       {selectedEventSponsors.length
@@ -795,6 +1310,190 @@ export const OrganizerDashboard = () => {
                 </div>
 
                 <div className="dashboard-subsection">
+                  <div className="sponsor-picker-head">
+                    <div>
+                      <span className="dashboard-kicker">Materiale</span>
+                      <h3>Încărcare materiale eveniment</h3>
+                    </div>
+                    <span>
+                      {eventMaterials.length}
+                      {selectedEvent.max_files
+                        ? ` / ${selectedEvent.max_files}`
+                        : ""}
+                    </span>
+                  </div>
+
+                  {isRejectedEvent(selectedEvent) ? (
+                    <p className="dashboard-message">
+                      Evenimentul a fost respins. Nu mai poți încărca materiale
+                      pentru acest eveniment.
+                    </p>
+                  ) : (
+                    <>
+                      <div className="dashboard-form-grid">
+                        <label>
+                          Titlu
+                          <input
+                            value={materialForm.title}
+                            onChange={(event) =>
+                              changeMaterialForm("title", event.target.value)
+                            }
+                          />
+                        </label>
+
+                        <label>
+                          Tip material
+                          <select
+                            value={materialForm.material_type_id}
+                            onChange={(event) =>
+                              changeMaterialForm(
+                                "material_type_id",
+                                event.target.value,
+                              )
+                            }
+                          >
+                            <option value="">Alege tipul</option>
+
+                            {materialTypes.map((type) => (
+                              <option key={type.id} value={type.id}>
+                                {type.name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+
+                        <label>
+                          Fișier
+                          <label className="custom-file-upload">
+                            <input
+                              type="file"
+                              hidden
+                              onChange={(event) =>
+                                changeMaterialForm(
+                                  "file",
+                                  event.target.files?.[0] ?? null,
+                                )
+                              }
+                            />
+
+                            <span>
+                              {materialForm.file
+                                ? materialForm.file.name
+                                : "Selectează fișier"}
+                            </span>
+                          </label>
+                        </label>
+
+                        <label>
+                          Vizibilitate
+                          <select
+                            value={String(materialForm.is_public)}
+                            onChange={(event) =>
+                              changeMaterialForm(
+                                "is_public",
+                                event.target.value === "true",
+                              )
+                            }
+                          >
+                            <option value="true">Da</option>
+                            <option value="false">Nu</option>
+                          </select>
+                        </label>
+                      </div>
+
+                      <div className="dashboard-modal-actions">
+                        <button
+                          className="dashboard-primary"
+                          type="button"
+                          onClick={uploadMaterial}
+                          disabled={
+                            !materialForm.file ||
+                            !materialForm.title ||
+                            !materialForm.material_type_id ||
+                            (selectedEvent.max_files !== null &&
+                              selectedEvent.max_files !== undefined &&
+                              eventMaterials.length >= selectedEvent.max_files)
+                          }
+                        >
+                          Încarcă material
+                        </button>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="registration-list">
+                    {eventMaterials.map((material) => {
+                      const fileName = material.file
+                        ? material.file.split("/").pop()
+                        : "Fără fișier";
+
+                      const fileUrl = material.file
+                        ? material.file.startsWith("http")
+                          ? material.file
+                          : `${import.meta.env.VITE_API}${material.file}`
+                        : "";
+
+                      return (
+                        <article
+                          key={material.id}
+                          className="registration-card"
+                        >
+                          <strong>{material.title}</strong>
+
+                          <span>
+                            {material.material_type?.name || "Tip necunoscut"}
+                          </span>
+
+                          <small>
+                            {material.is_public ? "Public" : "Privat"}
+                            {material.created_at
+                              ? ` · ${formatDateTime(material.created_at)}`
+                              : ""}
+                          </small>
+
+                          {material.is_public && fileUrl ? (
+                            <a
+                              className="material-download-link"
+                              href={fileUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              download
+                            >
+                              Descarcă: {fileName}
+                            </a>
+                          ) : (
+                            <small>{fileName}</small>
+                          )}
+
+                          {!isRejectedEvent(selectedEvent) && (
+                            <label className="material-visibility-toggle">
+                              <span>Vizibil pentru utilizatori</span>
+
+                              <select
+                                className="material-visibility-select"
+                                value={String(material.is_public)}
+                                onChange={(event) =>
+                                  updateMaterialVisibility(
+                                    material,
+                                    event.target.value === "true",
+                                  )
+                                }
+                              >
+                                <option value="true">Da</option>
+                                <option value="false">Nu</option>
+                              </select>
+                            </label>
+                          )}
+                        </article>
+                      );
+                    })}
+                    {eventMaterials.length === 0 && (
+                      <p>
+                        Nu există materiale încărcate pentru acest eveniment.
+                      </p>
+                    )}
+                  </div>
+
                   <h3>Persoane înscrise</h3>
                   <div className="registration-list">
                     {registrations.map((registration) => {

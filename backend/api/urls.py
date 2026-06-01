@@ -26,6 +26,7 @@ from .views import (
     ValidateEventView,
     CancelEventView,
     AcceptedEventsView,
+    RejectEventView,
     SponsorView,
     EventSponsorView,
     RegistrationView,
@@ -117,6 +118,7 @@ urlpatterns = [
         "events/<int:pk>/validate/", ValidateEventView.as_view(), name="event-validate"
     ),
     path("events/<int:pk>/cancel/", CancelEventView.as_view(), name="event-cancel"),
+    path("events/<int:pk>/reject/", RejectEventView.as_view(), name="event-reject"),
     path(
         "events/accepted/",
         AcceptedEventsView.as_view(),

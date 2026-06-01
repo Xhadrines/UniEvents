@@ -24,12 +24,25 @@ class EventService(BaseService):
     def get_by_participation_type(self, participation_type_id: int):
         return self.repository.get_by_participation_type(participation_type_id)
 
-    def validate_event(self, event_id: int, admin_user, accepted_status):
+    def validate_event(
+        self,
+        event_id: int,
+        admin_user,
+        accepted_status,
+        max_files=None,
+        max_file_size_mb=None,
+    ):
         # Marcheaza evenimentul ca validat de administrator
         event = self.repository.get_by_id(event_id)
 
         if not event:
             return None
+
+        if max_files is not None:
+            event.max_files = max_files
+
+        if max_file_size_mb is not None:
+            event.max_file_size_mb = max_file_size_mb
 
         event.status = accepted_status
         event.validated_by = admin_user

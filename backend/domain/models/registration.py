@@ -6,6 +6,10 @@ from .event import Event
 from .status import Status
 
 
+def registration_ticket_qr_upload_path(instance, filename):
+    return f"events/{instance.event.id}/tickets/qr_codes/{filename}"
+
+
 class Registration(BaseModel):
     # Nu folosim OneToOneField, deoarece un user se poate inscrie la mai multe evenimente
     user = models.ForeignKey(
@@ -18,7 +22,7 @@ class Registration(BaseModel):
 
     confirmation_email_sent = models.BooleanField(default=False)
     ticket_qr_code = models.ImageField(
-        upload_to="tickets/qr_codes/", null=True, blank=True
+        upload_to=registration_ticket_qr_upload_path, null=True, blank=True
     )
 
     checked_in = models.BooleanField(default=False)

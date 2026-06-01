@@ -925,3 +925,37 @@
   color: var(--text);
   line-height: 1.5;
 }
+
+.event-material-list {
+  display: grid;
+  gap: 12px;
+}
+
+.event-material-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  display: grid;
+  gap: 10px;
+}
+
+.event-material-card strong {
+  display: block;
+  color: var(--text-h);
+  margin-bottom: 6px;
+}
+
+.event-material-card span,
+.event-material-empty {
+  display: block;
+  color: var(--text);
+}
+
+.event-material-download {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  word-break: break-word;
+}

@@ -132,11 +132,14 @@ export const ProfileComponent = () => {
       )
     : specializations;
 
+  const authHeaders = (token?: string | null): Record<string, string> =>
+    token ? { Authorization: `Bearer ${token}` } : {};
+
   useEffect(() => {
     const token = localStorage.getItem("access");
 
     const loadProfileData = async () => {
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const headers = authHeaders(token);
 
       const [
         favoritesRes,
@@ -238,7 +241,7 @@ export const ProfileComponent = () => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...authHeaders(token),
           },
           body: JSON.stringify(body),
         },
@@ -341,7 +344,7 @@ export const ProfileComponent = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...authHeaders(token),
           },
           body: JSON.stringify({
             message: adminMessage,
@@ -374,9 +377,7 @@ export const ProfileComponent = () => {
         `${import.meta.env.VITE_API}/api/notifications/${notificationId}/read/`,
         {
           method: "POST",
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
+          headers: authHeaders(token),
         },
       );
 

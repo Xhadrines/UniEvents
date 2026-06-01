@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "./AdminDashboard.css";
 
 type Entity = Record<string, any> & { id?: number | string };
@@ -159,7 +159,34 @@ const HIDDEN_FORM_FIELDS = [
   "user_permissions",
 ];
 
-const authHeaders = () => {
+const FILE_FIELDS = new Set(["file", "logo", "qr_code", "ticket_qr_code"]);
+
+const CHOICE_FIELDS: Record<string, Array<{ value: string; label: string }>> = {
+  pricing_type: [
+    { value: "free", label: "Gratuit" },
+    { value: "paid", label: "Plătit" },
+  ],
+  access_policy: [
+    { value: "open", label: "Acces deschis" },
+    { value: "registration", label: "Necesită înscriere" },
+    { value: "ticket", label: "Necesită bilet" },
+    {
+      value: "registration_ticket",
+      label: "Necesită înscriere și bilet",
+    },
+  ],
+};
+
+const isFileField = (key: string) => FILE_FIELDS.has(key);
+
+const choiceOptionsForField = (key: string) => CHOICE_FIELDS[key] || [];
+
+const fileDisplayName = (value: unknown) => {
+  if (typeof value !== "string" || !value) return "";
+  return value.split("/").pop() || value;
+};
+
+const authHeaders = (): Record<string, string> => {
   const token = localStorage.getItem("access");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
@@ -249,7 +276,11 @@ const getColumns = (items: Entity[]) => {
 };
 
 const toEditablePayload = (form: Record<string, any>) => {
-  const payload: Record<string, any> = {};
+  const hasFile = Object.entries(form).some(
+    ([key, value]) => isFileField(key) && value instanceof File,
+  );
+
+  const payload: Record<string, any> | FormData = hasFile ? new FormData() : {};
 
   Object.entries(form).forEach(([key, value]) => {
     if (
@@ -257,27 +288,46 @@ const toEditablePayload = (form: Record<string, any>) => {
     )
       return;
 
+    const append = (field: string, fieldValue: any) => {
+      if (payload instanceof FormData) {
+        payload.append(field, fieldValue === null ? "" : String(fieldValue));
+      } else {
+        payload[field] = fieldValue;
+      }
+    };
+
+    if (isFileField(key)) {
+      if (value instanceof File) {
+        if (payload instanceof FormData) {
+          payload.append(key, value);
+        } else {
+          payload[key] = value;
+        }
+      } else if (value === "" || value === null || value === undefined) {
+        append(key, null);
+      }
+      return;
+    }
+
     if (value === "") {
-      payload[key] = null;
+      append(key, null);
       return;
     }
 
     if (typeof value === "object" && value !== null) {
-      if (value.id !== undefined) payload[`${key}_id`] = value.id;
+      if (value.id !== undefined) {
+        append(`${key}_id`, value.id);
+      }
       return;
     }
 
     if (key.endsWith("_id")) {
       const numericValue = Number(value);
-      payload[key] = Number.isNaN(numericValue) ? value : numericValue;
+      append(key, Number.isNaN(numericValue) ? value : numericValue);
       return;
     }
 
-    if (typeof value === "object" && value !== null && "id" in value) {
-      payload[key] = value.id;
-    } else {
-      payload[key] = value;
-    }
+    append(key, value);
   });
 
   return payload;
@@ -301,9 +351,12 @@ export const AdminDashboard = () => {
   const activeResource =
     CRUD_RESOURCES.find((item) => item.key === activeResourceKey) ||
     CRUD_RESOURCES[0];
-  const events = data.events || [];
+  const events = useMemo(() => data.events || [], [data.events]);
   const pendingEvents = useMemo(() => events.filter(isPendingEvent), [events]);
-  const activeItems = data[activeResource.key] || [];
+  const activeItems = useMemo(
+    () => data[activeResource.key] || [],
+    [data, activeResource.key],
+  );
 
   const getRelationOptions = (fieldKey: string) => {
     const relation = FK_FIELDS[fieldKey];
@@ -365,17 +418,19 @@ export const AdminDashboard = () => {
   );
 
   const request = async (endpoint: string, options: RequestInit = {}) => {
-    const headers = {
-      ...(options.body instanceof FormData
-        ? {}
-        : { "Content-Type": "application/json" }),
-      ...authHeaders(),
-      ...(options.headers || {}),
-    };
+    const requestHeaders = new Headers(options.headers);
+
+    if (!(options.body instanceof FormData)) {
+      requestHeaders.set("Content-Type", "application/json");
+    }
+
+    Object.entries(authHeaders()).forEach(([key, value]) => {
+      requestHeaders.set(key, value);
+    });
 
     const response = await fetch(`${apiBase()}${endpoint}`, {
       ...options,
-      headers,
+      headers: requestHeaders,
     });
     const hasBody = response.status !== 204;
     const body = hasBody ? await response.json().catch(() => null) : null;
@@ -397,7 +452,7 @@ export const AdminDashboard = () => {
     }));
   };
 
-  const loadAll = async () => {
+  const loadAll = useCallback(async () => {
     setLoading(true);
     setMessage("");
     try {
@@ -412,11 +467,11 @@ export const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadAll();
-  }, []);
+  }, [loadAll]);
 
   const openCreate = () => {
     const template = activeItems[0] || {};
@@ -425,6 +480,11 @@ export const AdminDashboard = () => {
         .filter((key) => !HIDDEN_FORM_FIELDS.includes(key))
         .map((key) => [key, ""]),
     );
+
+    if (activeResource.key === "events") {
+      nextForm.max_files = "";
+      nextForm.max_file_size_mb = "";
+    }
 
     setSelectedItem(null);
     setForm(nextForm);
@@ -441,6 +501,19 @@ export const AdminDashboard = () => {
     const editableForm = Object.fromEntries(
       Object.entries(item).filter(([key]) => !HIDDEN_FORM_FIELDS.includes(key)),
     );
+
+    if (activeResource.key === "events") {
+      editableForm.max_files = item.max_files ?? "";
+      editableForm.max_file_size_mb = item.max_file_size_mb ?? "";
+    }
+
+    if (activeResource.key === "events") {
+      editableForm.status_id = item.status?.id ?? item.status ?? "";
+      editableForm.max_files = item.max_files ?? "";
+      editableForm.max_file_size_mb = item.max_file_size_mb ?? "";
+
+      delete editableForm.status;
+    }
 
     setSelectedItem(item);
     setForm(editableForm);
@@ -464,7 +537,7 @@ export const AdminDashboard = () => {
 
       await request(endpoint, {
         method: isEdit ? "PATCH" : "POST",
-        body: JSON.stringify(payload),
+        body: payload instanceof FormData ? payload : JSON.stringify(payload),
       });
 
       setMessage(
@@ -526,22 +599,136 @@ export const AdminDashboard = () => {
   const rejectEvent = async (event: Entity) => {
     if (!event.id) return;
     const confirmed = window.confirm(
-      `Respingi/anulezi evenimentul „${event.name || event.id}”?`,
+      `Respingi evenimentul „${event.name || event.id}”?`,
     );
     if (!confirmed) return;
 
     try {
-      await request(`/api/events/${event.id}/cancel/`, { method: "POST" });
-      setMessage(`Evenimentul „${event.name || event.id}” a fost anulat.`);
+      await request(`/api/events/${event.id}/reject/`, { method: "POST" });
+      setMessage(`Evenimentul „${event.name || event.id}” a fost respins.`);
       await loadResource(CRUD_RESOURCES.find((r) => r.key === "events")!);
     } catch (error) {
       console.error(error);
       setMessage(
         error instanceof Error
           ? error.message
-          : "Nu s-a putut anula evenimentul.",
+          : "Nu s-a putut respinge evenimentul.",
       );
     }
+  };
+
+  const renderFormField = (key: string, value: any) => {
+    const isLong =
+      key.includes("description") ||
+      key.includes("message") ||
+      key.includes("comment");
+    const isDate =
+      typeof value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(value);
+    const relation = FK_FIELDS[key];
+    const relationOptions = relation ? getRelationOptions(key) : [];
+    const isBoolean =
+      typeof value === "boolean" || value === "true" || value === "false";
+    const choiceOptions = choiceOptionsForField(key);
+
+    const isNumberField = [
+      "capacity",
+      "max_files",
+      "max_file_size_mb",
+    ].includes(key);
+
+    return (
+      <label key={key} className={isLong ? "full" : ""}>
+        {relation?.label || key}
+
+        {relation ? (
+          <select
+            value={String(selectedRelationId(value))}
+            onChange={(event) => updateRelationField(key, event.target.value)}
+          >
+            <option value="">
+              Alege {relation.label?.toLowerCase() || key}
+            </option>
+            {relationOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {optionLabel(option)}
+              </option>
+            ))}
+          </select>
+        ) : isFileField(key) ? (
+          <>
+            <input
+              type="file"
+              onChange={(event) =>
+                setForm((previous) => ({
+                  ...previous,
+                  [key]: event.target.files?.[0] ?? "",
+                }))
+              }
+            />
+            {typeof value === "string" && value ? (
+              <small>Fișier curent: {fileDisplayName(value)}</small>
+            ) : null}
+          </>
+        ) : isBoolean ? (
+          <select
+            value={String(value)}
+            onChange={(event) =>
+              setForm((previous) => ({
+                ...previous,
+                [key]: event.target.value === "true",
+              }))
+            }
+          >
+            <option value="">Alege</option>
+            <option value="true">Da</option>
+            <option value="false">Nu</option>
+          </select>
+        ) : choiceOptions.length > 0 ? (
+          <select
+            value={String(value ?? "")}
+            onChange={(event) =>
+              setForm((previous) => ({
+                ...previous,
+                [key]: event.target.value,
+              }))
+            }
+          >
+            <option value="">Alege</option>
+            {choiceOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        ) : isLong ? (
+          <textarea
+            rows={4}
+            value={
+              typeof value === "object" ? JSON.stringify(value) : (value ?? "")
+            }
+            onChange={(event) =>
+              setForm((previous) => ({
+                ...previous,
+                [key]: event.target.value,
+              }))
+            }
+          />
+        ) : (
+          <input
+            type={isDate ? "datetime-local" : isNumberField ? "number" : "text"}
+            value={
+              typeof value === "object" ? displayValue(value) : (value ?? "")
+            }
+            onChange={(event) =>
+              setForm((previous) => ({
+                ...previous,
+                [key]: event.target.value,
+              }))
+            }
+          />
+        )}
+      </label>
+    );
   };
 
   return (
@@ -749,91 +936,9 @@ export const AdminDashboard = () => {
             ) : (
               <>
                 <div className="dashboard-form-grid">
-                  {Object.entries(form).map(([key, value]) => {
-                    const isLong =
-                      key.includes("description") ||
-                      key.includes("message") ||
-                      key.includes("comment");
-                    const isDate =
-                      typeof value === "string" &&
-                      /^\d{4}-\d{2}-\d{2}T/.test(value);
-                    const relation = FK_FIELDS[key];
-                    const relationOptions = relation
-                      ? getRelationOptions(key)
-                      : [];
-
-                    const isBoolean =
-                      typeof value === "boolean" ||
-                      value === "true" ||
-                      value === "false";
-
-                    return (
-                      <label key={key} className={isLong ? "full" : ""}>
-                        {relation?.label || key}
-
-                        {relation ? (
-                          <select
-                            value={String(selectedRelationId(value))}
-                            onChange={(event) =>
-                              updateRelationField(key, event.target.value)
-                            }
-                          >
-                            <option value="">
-                              Alege {relation.label?.toLowerCase() || key}
-                            </option>
-                            {relationOptions.map((option) => (
-                              <option key={option.id} value={option.id}>
-                                {optionLabel(option)}
-                              </option>
-                            ))}
-                          </select>
-                        ) : isBoolean ? (
-                          <select
-                            value={String(value)}
-                            onChange={(event) =>
-                              setForm((previous) => ({
-                                ...previous,
-                                [key]: event.target.value === "true",
-                              }))
-                            }
-                          >
-                            <option value="true">True</option>
-                            <option value="false">False</option>
-                          </select>
-                        ) : isLong ? (
-                          <textarea
-                            rows={4}
-                            value={
-                              typeof value === "object"
-                                ? JSON.stringify(value)
-                                : (value ?? "")
-                            }
-                            onChange={(event) =>
-                              setForm((previous) => ({
-                                ...previous,
-                                [key]: event.target.value,
-                              }))
-                            }
-                          />
-                        ) : (
-                          <input
-                            type={isDate ? "datetime-local" : "text"}
-                            value={
-                              typeof value === "object"
-                                ? displayValue(value)
-                                : (value ?? "")
-                            }
-                            onChange={(event) =>
-                              setForm((previous) => ({
-                                ...previous,
-                                [key]: event.target.value,
-                              }))
-                            }
-                          />
-                        )}
-                      </label>
-                    );
-                  })}
+                  {Object.entries(form).map(([key, value]) =>
+                    renderFormField(key, value),
+                  )}
                 </div>
 
                 <div className="dashboard-modal-actions">

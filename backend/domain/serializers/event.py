@@ -177,23 +177,32 @@ class EventSerializer(BaseSerializer):
         validated_data["organizer"] = organizer
         validated_data["status"] = waiting_status
 
-        validated_data.pop("max_files", None)
-        validated_data.pop("max_file_size_mb", None)
-
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
         user = request.user if request else None
 
-        is_admin = bool(user and (user.is_staff or user.is_superuser))
+        role_name = ""
+
+        try:
+            role_name = user.userprofile.role.name.lower()
+        except Exception:
+            role_name = ""
+
+        is_admin = bool(
+            user
+            and (
+                user.is_staff
+                or user.is_superuser
+                or role_name in ["admin", "administrator"]
+            )
+        )
 
         validated_data.pop("organizer", None)
 
         if not is_admin:
             validated_data.pop("status", None)
-            validated_data.pop("max_files", None)
-            validated_data.pop("max_file_size_mb", None)
 
         return super().update(instance, validated_data)
 

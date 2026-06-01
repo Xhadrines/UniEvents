@@ -20,6 +20,7 @@ from .event import (
     UpcomingEventsView,
     ValidateEventView,
     CancelEventView,
+    RejectEventView,
     AcceptedEventsView,
 )
 from .registration import (

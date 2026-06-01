@@ -254,6 +254,13 @@
   color: var(--text-h);
 }
 
+.dashboard-form-grid label {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
 .dashboard-form-grid .full {
   grid-column: 1 / -1;
 }
@@ -432,4 +439,69 @@
   .dashboard-modal-backdrop {
     padding: 12px;
   }
+}
+
+.material-download-link {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.material-visibility-toggle {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.custom-file-upload {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  border-radius: 12px;
+  padding: 11px 12px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+
+  display: flex;
+  align-items: center;
+
+  min-height: 48px;
+}
+
+.custom-file-upload:hover {
+  border-color: var(--accent);
+}
+
+.custom-file-upload:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.custom-file-upload span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.material-visibility-select {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  border-radius: 12px;
+  padding: 11px 12px;
+  font: inherit;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.material-visibility-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
 }
