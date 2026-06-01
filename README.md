@@ -2,13 +2,64 @@
 
 UniEvents este o platformă centralizată pentru gestionarea și descoperirea evenimentelor universitare organizate în cadrul facultății.
 
-Funcționalități principale:
+## Funcționalități principale:
 
-- WIP
+### Utilizatori studenți
+
+- Autentificare folosind Google OAuth (@student.usv.ro);
+- Vizualizare evenimente în format listă și calendar interactiv;
+- Filtrare și căutare evenimente după:
+  - categorie;
+  - locație;
+  - organizator;
+  - tip participare;
+  - perioadă;
+  - filtre suplimentare;
+- Sortare evenimente;
+- Combinare filtre folosind operatori AND și OR;
+- Vizualizare detalii complete ale evenimentelor;
+- Înscriere la evenimente;
+- Listă de așteptare pentru evenimentele fără locuri disponibile;
+- Anulare înscriere;
+- Adăugare evenimente la favorite;
+- Notificări și remindere pentru evenimente favorite;
+- Export evenimente în Google Calendar și format .ics;
+- Vizualizare și descărcare materiale publice;
+- Oferire feedback și rating după finalizarea evenimentelor.
+
+### Organizatori evenimente
+
+- Creare, editare și ștergere evenimente;
+- Gestionare sponsori și materiale pentru evenimente;
+- Încărcare fișiere și materiale publice/private;
+- Setare limite pentru numărul și dimensiunea fișierelor;
+- Gestionare participanți și liste de înscrieri;
+- Vizualizare feedback pentru evenimente;
+- Configurare:
+  - capacitate participanți;
+  - deadline înscriere;
+  - acces liber / înscriere / bilet.
+
+### Administratori
+
+- Gestionare utilizatori și profiluri;
+- Gestionare organizatori;
+- Validare și respingere evenimente;
+- Panou CRUD pentru administrarea tuturor entităților;
+- Gestionare notificări, categorii, locații și statusuri;
+- Vizualizare evenimente aflate în așteptare.
 
 ## Scop
 
-WIP
+Scopul proiectului UniEvents este dezvoltarea unei platforme moderne pentru gestionarea și promovarea evenimentelor universitare, oferind un spațiu centralizat unde studenții pot descoperi rapid activități relevante, iar organizatorii și administratorii pot administra eficient evenimentele și participanții.
+
+Platforma urmărește:
+
+- digitalizarea procesului de organizare a evenimentelor universitare;
+- centralizarea informațiilor despre evenimente;
+- îmbunătățirea comunicării dintre studenți și organizatori;
+- automatizarea proceselor de înscriere, validare și notificare;
+- oferirea unei experiențe interactive și moderne pentru utilizatori.
 
 ## Tehnologii
 
