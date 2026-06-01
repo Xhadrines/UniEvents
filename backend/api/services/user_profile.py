@@ -4,7 +4,9 @@ from ..repository import (
     UserProfileRepository,
     FacultyRepository,
     SpecializationRepository,
+    UserRepository,
 )
+
 
 from domain.serializers import UserProfileSerializer
 
@@ -74,4 +76,55 @@ class UserProfileService(BaseService):
                 }
                 for specialization in specializations
             ],
+        }
+
+    def update_my_profile(self, user, data):
+        user_repository = UserRepository()
+
+        username = data.get("username")
+        first_name = data.get("first_name")
+        last_name = data.get("last_name")
+
+        if username and username != user.username:
+            if user_repository.username_exists_for_other_user(username, user.id):
+                raise ValueError("Acest username este deja folosit.")
+
+        user = user_repository.update_profile_fields(
+            user=user,
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+        )
+
+        profile = self.get_by_user_id(user.id)
+
+        if not profile:
+            raise ValueError("Profilul nu a fost găsit.")
+
+        profile_data = {}
+
+        allowed_profile_fields = [
+            "faculty",
+            "specialization",
+            "study_year",
+            "group",
+            "semi_group",
+        ]
+
+        for field in allowed_profile_fields:
+            if field in data:
+                profile_data[field] = data.get(field)
+
+        if profile_data:
+            serializer = UserProfileSerializer(
+                profile,
+                data=profile_data,
+                partial=True,
+            )
+            serializer.is_valid(raise_exception=True)
+            profile = serializer.save()
+
+        return {
+            "user": user,
+            "profile": profile,
         }

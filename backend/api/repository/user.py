@@ -48,3 +48,21 @@ class UserRepository(BaseRepository):
                 "is_active": True,
             },
         )
+
+    def username_exists_for_other_user(self, username: str, user_id: int) -> bool:
+        return self.model.objects.filter(username=username).exclude(id=user_id).exists()
+
+    def update_profile_fields(
+        self, user, username=None, first_name=None, last_name=None
+    ):
+        if username is not None:
+            user.username = username
+
+        if first_name is not None:
+            user.first_name = first_name
+
+        if last_name is not None:
+            user.last_name = last_name
+
+        user.save()
+        return user

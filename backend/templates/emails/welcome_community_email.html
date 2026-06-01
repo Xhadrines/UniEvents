@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bun venit în comunitatea UniEvents</title>
+</head>
+<body style="margin:0; padding:0; background-color:#16171d; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:#f3f4f6;">
+  <div style="max-width:600px; margin:40px auto; padding:20px; background-color:#1e1e1e; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3); color:#f3f4f6;">
+
+    <h1 style="color:#c084fc; font-size:24px; text-align:center; margin-bottom:20px;">
+      UniEvents 🎉
+    </h1>
+
+    <p style="font-size:16px; line-height:1.5;">
+      Salut{% if first_name %}, {{ first_name }}{% else %}, {{ username }}{% endif %},
+    </p>
+
+    <p style="font-size:16px; line-height:1.5;">
+      Bun venit în comunitatea <strong>UniEvents</strong>!
+    </p>
+
+    <p style="font-size:16px; line-height:1.5;">
+      Contul tău a fost creat cu succes, iar profilul tău este deja complet și gata de utilizare.
+    </p>
+
+    <div style="margin:24px 0; padding:16px; background-color:#262626; border-radius:10px;">
+      <p style="margin-top:0; font-size:15px; line-height:1.5;">
+        Acum poți:
+      </p>
+
+      <ul style="padding-left:20px; line-height:1.8;">
+        <li>Explora evenimente universitare și externe</li>
+        <li>Salva evenimente favorite</li>
+        <li>Primi notificări și remindere</li>
+        <li>Participa la activități și evenimente</li>
+      </ul>
+    </div>
+
+    <p style="font-size:16px; line-height:1.5;">
+      Dacă dorești să organizezi evenimente, să devii sponsor sau să colaborezi cu platforma UniEvents, poți trimite o cerere direct din pagina ta de profil.
+    </p>
+
+    <p style="text-align:center; margin:28px 0;">
+      <a href="{{ profile_url }}"
+         style="display:inline-block; padding:12px 24px; background-color:#aa3bff; color:#ffffff; text-decoration:none; border-radius:8px; font-weight:bold;">
+        Accesează Profilul
+      </a>
+    </p>
+
+    <p style="font-size:16px; line-height:1.5;">
+      Ne bucurăm că faci parte din comunitatea UniEvents 🚀
+    </p>
+
+    <footer style="margin-top:30px; font-size:12px; text-align:center; color:#aaaaaa;">
+      Acest email a fost trimis automat de platforma UniEvents.
+    </footer>
+  </div>
+</body>
+</html>

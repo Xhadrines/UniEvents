@@ -889,3 +889,39 @@
   margin: 0;
   color: var(--text);
 }
+
+.favorite-button {
+  margin-top: 12px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.favorite-button:hover {
+  transform: translateY(-1px);
+}
+
+.favorite-button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.favorite-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.favorite-message {
+  margin: 10px 0 0;
+  color: var(--text);
+  line-height: 1.5;
+}

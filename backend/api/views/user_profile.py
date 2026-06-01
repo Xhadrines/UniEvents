@@ -45,3 +45,36 @@ class CompleteProfileView(APIView):
         email_token_service.mark_as_used(token_obj)
 
         return Response(profile_data, status=status.HTTP_200_OK)
+
+
+class MyProfileUpdateView(APIView):
+    def patch(self, request):
+        service = UserProfileService()
+
+        try:
+            result = service.update_my_profile(
+                user=request.user,
+                data=request.data,
+            )
+
+            user = result["user"]
+            profile = result["profile"]
+
+            return Response(
+                {
+                    "user_id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "date_joined": user.date_joined,
+                    "profile": UserProfileSerializer(profile).data,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        except ValueError as error:
+            return Response(
+                {"error": str(error)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )

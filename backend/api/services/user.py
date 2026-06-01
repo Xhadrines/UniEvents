@@ -45,8 +45,18 @@ class UserService(BaseService):
             role=role,
         )
 
-        token_obj = self.email_token_service.create_token_for_user(user)
-        self.email_service.send_complete_profile_email(user, token_obj.token)
+        if role and role.name.lower() == "student":
+            token_obj = self.email_token_service.create_token_for_user(user)
+
+            self.email_service.send_complete_profile_email(
+                user,
+                token_obj.token,
+            )
+        else:
+            self.email_service.send_welcome_community_email(
+                user=user,
+                role=role,
+            )
 
         return user
 
@@ -63,18 +73,53 @@ class UserService(BaseService):
             "user_id": user.id,
             "username": user.username,
             "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "date_joined": user.date_joined,
             "profile": (
                 None
                 if not profile
                 else {
                     "id": profile.id,
-                    "status": profile.status_id,
-                    "role": profile.role_id,
-                    "faculty": profile.faculty_id,
-                    "specialization": profile.specialization_id,
+                    "status": (
+                        {
+                            "id": profile.status.id,
+                            "name": profile.status.name,
+                        }
+                        if profile.status
+                        else None
+                    ),
+                    "role": (
+                        {
+                            "id": profile.role.id,
+                            "name": profile.role.name,
+                        }
+                        if profile.role
+                        else None
+                    ),
+                    "faculty": (
+                        {
+                            "id": profile.faculty.id,
+                            "name": profile.faculty.name,
+                        }
+                        if profile.faculty
+                        else None
+                    ),
+                    "specialization": (
+                        {
+                            "id": profile.specialization.id,
+                            "name": profile.specialization.name,
+                        }
+                        if profile.specialization
+                        else None
+                    ),
                     "study_year": profile.study_year,
                     "group": profile.group,
                     "semi_group": profile.semi_group,
+                    "google_sub": profile.google_sub,
+                    "is_google_student": profile.is_google_student,
+                    "created_at": profile.created_at,
+                    "updated_at": profile.updated_at,
                 }
             ),
         }

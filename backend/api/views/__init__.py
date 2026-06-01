@@ -2,7 +2,7 @@ from .home import HomeView
 from .base_crud import BaseCRUDView
 from .category import CategoryView
 from .status import StatusView
-from .role import RoleView
+from .role import RoleView, AdminRoleRequestView
 from .faculty import FacultyView
 from .specialization import SpecializationView
 from .participation_type import ParticipationTypeView
@@ -30,6 +30,7 @@ from .event_material import (
 )
 from .favorite_event import (
     FavoriteEventView,
+    MyFavoriteEventsView,
     AddFavoriteEventView,
     RemoveFavoriteEventView,
 )
@@ -39,7 +40,7 @@ from .notification import (
     UnreadNotificationsView,
     MarkNotificationAsReadView,
 )
-from .user_profile import UserProfileView, CompleteProfileView
+from .user_profile import UserProfileView, CompleteProfileView, MyProfileUpdateView
 from .user import (
     UserView,
     RegisterView,

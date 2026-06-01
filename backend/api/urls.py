@@ -5,6 +5,7 @@ from .views import (
     FacultyView,
     SpecializationView,
     RoleView,
+    AdminRoleRequestView,
     StatusView,
     UserView,
     RegisterView,
@@ -14,6 +15,7 @@ from .views import (
     GoogleAuthView,
     UserProfileView,
     CompleteProfileView,
+    MyProfileUpdateView,
     OrganizerTypeView,
     OrganizerView,
     CategoryView,
@@ -37,6 +39,7 @@ from .views import (
     EventMaterialsByEventView,
     UploadEventMaterialView,
     FavoriteEventView,
+    MyFavoriteEventsView,
     AddFavoriteEventView,
     RemoveFavoriteEventView,
     NotificationTypeView,
@@ -60,6 +63,11 @@ urlpatterns = [
     ),
     path("roles/", RoleView.as_view(), name="role"),
     path("roles/<int:pk>/", RoleView.as_view(), name="role-detail"),
+    path(
+        "admin-role-request/",
+        AdminRoleRequestView.as_view(),
+        name="admin-role-request",
+    ),
     path("statuses/", StatusView.as_view(), name="status"),
     path("statuses/<int:pk>/", StatusView.as_view(), name="status-detail"),
     path("users/", UserView.as_view(), name="user"),
@@ -78,6 +86,7 @@ urlpatterns = [
         "user-profiles/<int:pk>/", UserProfileView.as_view(), name="user-profile-detail"
     ),
     path("complete-profile/", CompleteProfileView.as_view(), name="complete-profile"),
+    path("my-profile/update/", MyProfileUpdateView.as_view(), name="my-profile-update"),
     path("organizer-types/", OrganizerTypeView.as_view(), name="organizer-type"),
     path(
         "organizer-types/<int:pk>/",
@@ -171,6 +180,11 @@ urlpatterns = [
         name="event-material-upload",
     ),
     path("favorite-events/", FavoriteEventView.as_view(), name="favorite-event"),
+    path(
+        "my-favorite-events/",
+        MyFavoriteEventsView.as_view(),
+        name="my-favorite-events",
+    ),
     path(
         "favorite-events/<int:pk>/",
         FavoriteEventView.as_view(),

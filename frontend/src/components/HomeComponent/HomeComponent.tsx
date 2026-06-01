@@ -76,6 +76,7 @@ type EventItem = {
   validated_at?: Date;
   created_at?: Date;
   updated_at?: Date;
+  is_favorite?: boolean;
 };
 
 type FeedbackItem = {
@@ -209,6 +210,11 @@ export const HomeComponent = () => {
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [registrationMessage, setRegistrationMessage] = useState("");
+  const [favoriteEventIds, setFavoriteEventIds] = useState<Set<number>>(
+    () => new Set(),
+  );
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [favoriteMessage, setFavoriteMessage] = useState("");
 
   const categories = ["Toate", ...categoriesList.map((c) => c.name)];
   const locations = ["Toate", ...locationsList.map((l) => l.name)];
@@ -449,6 +455,42 @@ export const HomeComponent = () => {
     };
 
     fetchLists();
+  }, []);
+
+  useEffect(() => {
+    const fetchFavoriteEvents = async () => {
+      try {
+        const token = localStorage.getItem("access");
+
+        const res = await fetch(
+          `${import.meta.env.VITE_API}/api/my-favorite-events/`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (!res.ok) {
+          console.error("Failed to fetch favorite events", res.status);
+          return;
+        }
+
+        const data = await res.json();
+
+        const ids = new Set<number>(
+          data
+            .map((favorite: any) => favorite.event?.id)
+            .filter((id: unknown): id is number => typeof id === "number"),
+        );
+
+        setFavoriteEventIds(ids);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchFavoriteEvents();
   }, []);
 
   const filteredEvents = useMemo(() => {
@@ -739,6 +781,58 @@ export const HomeComponent = () => {
       setRegistrationMessage("A apărut o eroare.");
     } finally {
       setRegistrationLoading(false);
+    }
+  };
+
+  const toggleFavorite = async () => {
+    if (!selectedEvent) return;
+
+    setFavoriteLoading(true);
+    setFavoriteMessage("");
+
+    const token = localStorage.getItem("access");
+    const isFavorite = favoriteEventIds.has(selectedEvent.id);
+
+    try {
+      const res = await fetch(
+        isFavorite
+          ? `${import.meta.env.VITE_API}/api/events/${selectedEvent.id}/favorite/remove/`
+          : `${import.meta.env.VITE_API}/api/events/${selectedEvent.id}/favorite/`,
+        {
+          method: isFavorite ? "DELETE" : "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!res.ok && res.status !== 204) {
+        setFavoriteMessage("Nu s-a putut actualiza lista de favorite.");
+        return;
+      }
+
+      setFavoriteEventIds((previous) => {
+        const next = new Set(previous);
+
+        if (isFavorite) {
+          next.delete(selectedEvent.id);
+        } else {
+          next.add(selectedEvent.id);
+        }
+
+        return next;
+      });
+
+      setFavoriteMessage(
+        isFavorite
+          ? "Eveniment eliminat de la favorite."
+          : "Eveniment adăugat la favorite. Ai primit și un email de confirmare.",
+      );
+    } catch (err) {
+      console.error(err);
+      setFavoriteMessage("A apărut o eroare.");
+    } finally {
+      setFavoriteLoading(false);
     }
   };
 
@@ -1064,6 +1158,27 @@ export const HomeComponent = () => {
               <div>
                 <span className="modal-kicker">Detalii eveniment</span>
                 <h2>{selectedEvent.name}</h2>
+
+                <button
+                  type="button"
+                  className={
+                    favoriteEventIds.has(selectedEvent.id)
+                      ? "favorite-button active"
+                      : "favorite-button"
+                  }
+                  disabled={favoriteLoading}
+                  onClick={toggleFavorite}
+                >
+                  {favoriteLoading
+                    ? "Se procesează..."
+                    : favoriteEventIds.has(selectedEvent.id)
+                      ? "★ Elimină de la favorite"
+                      : "☆ Adaugă la favorite"}
+                </button>
+
+                {favoriteMessage && (
+                  <p className="favorite-message">{favoriteMessage}</p>
+                )}
               </div>
               <button
                 type="button"

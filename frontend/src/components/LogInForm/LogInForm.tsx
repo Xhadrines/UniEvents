@@ -15,6 +15,9 @@ type AuthResponse = {
   user_id: string | number;
   username: string;
   email: string;
+  first_name: string;
+  last_name: string;
+  date_joined: string;
   profile: unknown;
 };
 
@@ -38,6 +41,9 @@ export const LogInForm = ({ onLogin, onGoogleLogin }: Props) => {
         user_id: data.user_id,
         username: data.username,
         email: data.email,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        date_joined: data.date_joined,
         profile: data.profile,
       }),
     );

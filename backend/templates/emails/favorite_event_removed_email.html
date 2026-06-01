@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Eveniment eliminat de la favorite - UniEvents</title>
+</head>
+<body style="margin:0; padding:0; background-color:#16171d; font-family:'Segoe UI', sans-serif; color:#f3f4f6;">
+  <div style="max-width:600px; margin:40px auto; padding:24px; background-color:#1e1e1e; border-radius:14px;">
+    <h1 style="color:#c084fc; text-align:center;">UniEvents</h1>
+
+    <p>Salut {{ username }},</p>
+
+    <p>
+      Evenimentul <strong>{{ event.name }}</strong> a fost eliminat din lista ta de favorite.
+    </p>
+
+    <p>
+      Nu îți vom mai trimite remindere pentru acest eveniment prin lista de favorite.
+    </p>
+
+    <p>
+      <strong>Data:</strong> {{ event.start_date }}<br>
+      <strong>Locație:</strong> {{ event.location.name }}<br>
+      <strong>Organizator:</strong> {{ event.organizer.name }}
+    </p>
+
+    <div style="margin-top:24px; padding:16px; background-color:#2a2a2a; border-radius:12px;">
+      <strong>Descriere eveniment:</strong>
+      <p>{{ event.description }}</p>
+    </div>
+
+    <p style="margin-top:24px;">
+      Poți adăuga oricând evenimentul înapoi la favorite din platforma UniEvents.
+    </p>
+  </div>
+</body>
+</html>
