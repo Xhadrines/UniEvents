@@ -49,3 +49,6 @@ class EventService(BaseService):
         event.save()
 
         return event
+
+    def get_accepted_events(self):
+        return self.repository.get_accepted_events()

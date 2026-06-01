@@ -71,3 +71,18 @@ class CancelEventView(APIView):
                 context={"request": request},
             ).data
         )
+
+
+class AcceptedEventsView(APIView):
+    def get(self, request):
+        service = EventService()
+
+        events = service.get_accepted_events()
+
+        serializer = EventSerializer(
+            events,
+            many=True,
+            context={"request": request},
+        )
+
+        return Response(serializer.data)

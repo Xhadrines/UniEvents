@@ -8,6 +8,7 @@ import { ResetPasswordConfirm } from "../pages/ResetPasswordConfirm/ResetPasswor
 import CompleteProfilePage from "../pages/CompleteProfile/CompleteProfile";
 import Home from "../pages/Home/Home";
 import Profile from "../pages/Profile/Profile";
+import Dashboard from "../pages/Dashboard/Dashboard";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const accessToken = localStorage.getItem("access");
@@ -50,6 +51,15 @@ export const AppRouter = () => {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
               </ProtectedRoute>
             }
           />

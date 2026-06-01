@@ -15,7 +15,13 @@ from .event_sponsor import EventSponsorView
 from .notification_type import NotificationTypeView
 from .report import ReportView
 from .email_token import EmailTokenView
-from .event import EventView, UpcomingEventsView, ValidateEventView, CancelEventView
+from .event import (
+    EventView,
+    UpcomingEventsView,
+    ValidateEventView,
+    CancelEventView,
+    AcceptedEventsView,
+)
 from .registration import (
     RegistrationView,
     RegisterToEventView,

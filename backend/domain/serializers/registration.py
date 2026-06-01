@@ -7,6 +7,8 @@ from .base_serializer import BaseSerializer
 
 class RegistrationSerializer(BaseSerializer):
     status_name = serializers.CharField(source="status.name", read_only=True)
+    username = serializers.CharField(source="user.username", read_only=True)
+    email = serializers.EmailField(source="user.email", read_only=True)
 
     class Meta:
         model = Registration
@@ -16,6 +18,8 @@ class RegistrationSerializer(BaseSerializer):
             "event",
             "status",
             "status_name",
+            "username",
+            "email",
             "confirmation_email_sent",
             "ticket_qr_code",
             "checked_in",

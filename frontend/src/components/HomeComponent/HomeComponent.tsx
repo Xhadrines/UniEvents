@@ -325,13 +325,16 @@ export const HomeComponent = () => {
       try {
         const token = localStorage.getItem("access");
 
-        const res = await fetch(`${import.meta.env.VITE_API}/api/events/`, {
-          headers: token
-            ? {
-                Authorization: `Bearer ${token}`,
-              }
-            : {},
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API}/api/events/accepted/`,
+          {
+            headers: token
+              ? {
+                  Authorization: `Bearer ${token}`,
+                }
+              : {},
+          },
+        );
 
         if (!res.ok) {
           console.error("Failed to fetch events", res.status);

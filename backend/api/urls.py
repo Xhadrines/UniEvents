@@ -25,6 +25,7 @@ from .views import (
     UpcomingEventsView,
     ValidateEventView,
     CancelEventView,
+    AcceptedEventsView,
     SponsorView,
     EventSponsorView,
     RegistrationView,
@@ -116,6 +117,11 @@ urlpatterns = [
         "events/<int:pk>/validate/", ValidateEventView.as_view(), name="event-validate"
     ),
     path("events/<int:pk>/cancel/", CancelEventView.as_view(), name="event-cancel"),
+    path(
+        "events/accepted/",
+        AcceptedEventsView.as_view(),
+        name="accepted-events",
+    ),
     path("sponsors/", SponsorView.as_view(), name="sponsor"),
     path("sponsors/<int:pk>/", SponsorView.as_view(), name="sponsor-detail"),
     path("event-sponsors/", EventSponsorView.as_view(), name="event-sponsor"),

@@ -1,4 +1,4 @@
-from ..models import Event
+from ..models import Event, Organizer, Location, Category, ParticipationType, Status
 
 from .base_serializer import BaseSerializer
 from .organizer import OrganizerSerializer
@@ -16,6 +16,39 @@ class EventSerializer(BaseSerializer):
     category = CategorySerializer(read_only=True)
     participation_type = ParticipationTypeSerializer(read_only=True)
     status = StatusSerializer(read_only=True)
+
+    organizer_id = serializers.PrimaryKeyRelatedField(
+        queryset=Organizer.objects.all(),
+        source="organizer",
+        write_only=True,
+        required=False,
+    )
+
+    location_id = serializers.PrimaryKeyRelatedField(
+        queryset=Location.objects.all(),
+        source="location",
+        write_only=True,
+    )
+
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        source="category",
+        write_only=True,
+    )
+
+    participation_type_id = serializers.PrimaryKeyRelatedField(
+        queryset=ParticipationType.objects.all(),
+        source="participation_type",
+        write_only=True,
+    )
+
+    status_id = serializers.PrimaryKeyRelatedField(
+        queryset=Status.objects.all(),
+        source="status",
+        write_only=True,
+        required=False,
+    )
+
     faculty = FacultySerializer(read_only=True, source="organizer.faculty")
     registered_count = serializers.SerializerMethodField()
     user_registration_status = serializers.SerializerMethodField()
@@ -36,6 +69,11 @@ class EventSerializer(BaseSerializer):
             "category",
             "participation_type",
             "status",
+            "organizer_id",
+            "location_id",
+            "category_id",
+            "participation_type_id",
+            "status_id",
             "start_date",
             "end_date",
             "capacity",
@@ -115,6 +153,49 @@ class EventSerializer(BaseSerializer):
 
     def validate(self, attrs):
         return self._normalize_access_fields(attrs)
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+
+        organizer = Organizer.objects.filter(user=request.user).first()
+        if not organizer:
+            raise serializers.ValidationError(
+                {"organizer": "Utilizatorul autentificat nu are organizator asociat."}
+            )
+
+        waiting_status = (
+            Status.objects.filter(name__iexact="In asteptare").first()
+            or Status.objects.filter(name__iexact="În așteptare").first()
+            or Status.objects.filter(name__iexact="Lista de asteptare").first()
+        )
+
+        if not waiting_status:
+            raise serializers.ValidationError(
+                {"status": "Nu există status pentru evenimente în așteptare."}
+            )
+
+        validated_data["organizer"] = organizer
+        validated_data["status"] = waiting_status
+
+        validated_data.pop("max_files", None)
+        validated_data.pop("max_file_size_mb", None)
+
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        user = request.user if request else None
+
+        is_admin = bool(user and (user.is_staff or user.is_superuser))
+
+        validated_data.pop("organizer", None)
+
+        if not is_admin:
+            validated_data.pop("status", None)
+            validated_data.pop("max_files", None)
+            validated_data.pop("max_file_size_mb", None)
+
+        return super().update(instance, validated_data)
 
     def get_pricing_type_display(self, obj: Event) -> str:
         return obj.get_pricing_type_display()

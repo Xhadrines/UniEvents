@@ -30,3 +30,6 @@ class EventRepository(BaseRepository):
     def get_by_participation_type(self, participation_type_id: int):
         # Returneaza evenimente dupa tipul de participare
         return self.model.objects.filter(participation_type_id=participation_type_id)
+
+    def get_accepted_events(self):
+        return self.model.objects.filter(status__name__iexact="Acceptat")
