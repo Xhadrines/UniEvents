@@ -1,3 +1,19 @@
+# Importăm toate service-urile aplicației într-un singur loc.
+#
+# Scopul acestui fișier este să centralizeze importurile,
+# astfel încât în alte părți ale proiectului să putem face:
+#
+# from services import UserService
+#
+# în loc de:
+#
+# from services.user import UserService
+#
+# Practic:
+# - codul devine mai curat,
+# - importurile sunt mai scurte,
+# - pachetul services devine mai ușor de folosit.
+
 from .base_service import BaseService
 from .category import CategoryService
 from .status import StatusService

@@ -1,39 +1,96 @@
 def default_status_data():
+    """
+    Returnează lista statusurilor default
+    utilizate în aplicație.
+
+    Statusurile sunt folosite pentru:
+    - utilizatori,
+    - evenimente,
+    - înscrieri,
+    - notificări,
+    - procese administrative.
+    """
+
     return [
+        # =====================================================
+        # ACTIV
+        # =====================================================
         {
+            # Status activ.
             "name": "Activ",
-            "description": "Entity is active and can be used.",
+            # Descriere.
+            "description": ("Entity is active and can be used."),
         },
+        # =====================================================
+        # INACTIV
+        # =====================================================
         {
+            # Status inactiv.
             "name": "Inactiv",
-            "description": "Entity is inactive but can be reactivated.",
+            # Descriere.
+            "description": ("Entity is inactive but can be reactivated."),
         },
+        # =====================================================
+        # STERS
+        # =====================================================
         {
+            # Entitate marcată ca ștearsă.
             "name": "Sters",
-            "description": "Entity is marked as deleted.",
+            # Descriere.
+            "description": ("Entity is marked as deleted."),
         },
+        # =====================================================
+        # IN ASTEPTARE
+        # =====================================================
         {
+            # Status pending / awaiting approval.
             "name": "In asteptare",
-            "description": "Entity is waiting for validation or approval.",
+            # Descriere.
+            "description": ("Entity is waiting for validation " "or approval."),
         },
+        # =====================================================
+        # ANULAT
+        # =====================================================
         {
+            # Status anulat.
             "name": "Anulat",
-            "description": "Entity was cancelled.",
+            # Descriere.
+            "description": ("Entity was cancelled."),
         },
+        # =====================================================
+        # RESPINS
+        # =====================================================
         {
+            # Status respins.
             "name": "Respins",
-            "description": "Entity was rejected.",
+            # Descriere.
+            "description": ("Entity was rejected."),
         },
+        # =====================================================
+        # ACCEPTAT
+        # =====================================================
         {
+            # Status acceptat.
             "name": "Acceptat",
-            "description": "Entity was accepted or approved.",
+            # Descriere.
+            "description": ("Entity was accepted or approved."),
         },
+        # =====================================================
+        # LISTA DE ASTEPTARE
+        # =====================================================
         {
+            # Waiting list.
             "name": "Lista de asteptare",
-            "description": "Registration is placed on the waiting list.",
+            # Descriere.
+            "description": ("Registration is placed on the " "waiting list."),
         },
+        # =====================================================
+        # FINALIZAT
+        # =====================================================
         {
+            # Proces sau eveniment finalizat.
             "name": "Finalizat",
-            "description": "Event or process is finished.",
+            # Descriere.
+            "description": ("Event or process is finished."),
         },
     ]

@@ -1,15 +1,42 @@
 def default_participation_type_data():
+    """
+    Returnează lista tipurilor de participare default
+    utilizate pentru evenimente.
+
+    Aceste tipuri definesc modul în care
+    participanții pot lua parte la eveniment.
+    """
+
     return [
+        # =====================================================
+        # FIZIC
+        # =====================================================
         {
+            # Participare fizică.
             "name": "Fizic",
-            "description": "Participants attend the event at the physical location.",
+            # Descriere.
+            "description": (
+                "Participants attend the event " "at the physical location."
+            ),
         },
+        # =====================================================
+        # ONLINE
+        # =====================================================
         {
+            # Participare online.
             "name": "Online",
-            "description": "Participants attend the event through an online platform.",
+            # Descriere.
+            "description": (
+                "Participants attend the event " "through an online platform."
+            ),
         },
+        # =====================================================
+        # HIBRID
+        # =====================================================
         {
+            # Participare mixtă.
             "name": "Hibrid",
-            "description": "Participants can attend either physically or online.",
+            # Descriere.
+            "description": ("Participants can attend either " "physically or online."),
         },
     ]

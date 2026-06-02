@@ -29,16 +29,34 @@ from .default_data import (
     default_email_token_data,
 )
 
+# Aplicațiile pentru care rulează seed-ul automat
 APPS = ["domain"]
 
 
 @receiver(post_migrate)
 def insert_default_data(sender, **kwargs):
-    # Ruleaza seed-ul doar pentru aplicatia api
+    """
+    Seed automat rulat după migrarea bazei de date.
+
+    Populează inițial toate tabelele cu date default:
+    - utilizatori
+    - roluri și statusuri
+    - structuri academice
+    - evenimente
+    - notificări
+    - feedback etc.
+    """
+
+    # Numele aplicației care a declanșat semnalul
     app_name = sender.name.split(".")[-1]
 
+    # Rulează seed doar pentru aplicațiile permise
     if app_name not in APPS:
         return
+
+    # =====================================================
+    # STATUS
+    # =====================================================
 
     Status = apps.get_model(app_name, "Status")
     for data in default_status_data():
@@ -47,12 +65,20 @@ def insert_default_data(sender, **kwargs):
             defaults=data,
         )
 
+    # =====================================================
+    # ROLE
+    # =====================================================
+
     Role = apps.get_model(app_name, "Role")
     for data in default_role_data():
         Role.objects.get_or_create(
             name=data["name"],
             defaults=data,
         )
+
+    # =====================================================
+    # FACULTY + SPECIALIZATION
+    # =====================================================
 
     Faculty = apps.get_model(app_name, "Faculty")
     for data in default_faculty_data():
@@ -69,6 +95,10 @@ def insert_default_data(sender, **kwargs):
             defaults=data,
         )
 
+    # =====================================================
+    # USERS
+    # =====================================================
+
     for data in default_user_data():
         password = data.pop("password")
 
@@ -81,12 +111,20 @@ def insert_default_data(sender, **kwargs):
             user.set_password(password)
             user.save()
 
+    # =====================================================
+    # USER PROFILE
+    # =====================================================
+
     UserProfile = apps.get_model(app_name, "UserProfile")
     for data in default_user_profile_data():
         UserProfile.objects.get_or_create(
             user=data["user"],
             defaults=data,
         )
+
+    # =====================================================
+    # ORGANIZERS
+    # =====================================================
 
     OrganizerType = apps.get_model(app_name, "OrganizerType")
     for data in default_organizer_type_data():
@@ -101,6 +139,10 @@ def insert_default_data(sender, **kwargs):
             user=data["user"],
             defaults=data,
         )
+
+    # =====================================================
+    # EVENT CATALOG STRUCTURE
+    # =====================================================
 
     Category = apps.get_model(app_name, "Category")
     for data in default_category_data():
@@ -123,12 +165,20 @@ def insert_default_data(sender, **kwargs):
             defaults=data,
         )
 
+    # =====================================================
+    # EVENTS
+    # =====================================================
+
     Event = apps.get_model(app_name, "Event")
     for data in default_event_data():
         Event.objects.get_or_create(
             name=data["name"],
             defaults=data,
         )
+
+    # =====================================================
+    # SPONSORS
+    # =====================================================
 
     Sponsor = apps.get_model(app_name, "Sponsor")
     for data in default_sponsor_data():
@@ -145,6 +195,10 @@ def insert_default_data(sender, **kwargs):
             defaults=data,
         )
 
+    # =====================================================
+    # REGISTRATIONS
+    # =====================================================
+
     Registration = apps.get_model(app_name, "Registration")
     for data in default_registration_data():
         Registration.objects.get_or_create(
@@ -153,6 +207,10 @@ def insert_default_data(sender, **kwargs):
             defaults=data,
         )
 
+    # =====================================================
+    # FEEDBACK
+    # =====================================================
+
     Feedback = apps.get_model(app_name, "Feedback")
     for data in default_feedback_data():
         Feedback.objects.get_or_create(
@@ -160,6 +218,10 @@ def insert_default_data(sender, **kwargs):
             event=data["event"],
             defaults=data,
         )
+
+    # =====================================================
+    # MATERIALS
+    # =====================================================
 
     MaterialType = apps.get_model(app_name, "MaterialType")
     for data in default_material_type_data():
@@ -176,6 +238,10 @@ def insert_default_data(sender, **kwargs):
             defaults=data,
         )
 
+    # =====================================================
+    # FAVORITES
+    # =====================================================
+
     FavoriteEvent = apps.get_model(app_name, "FavoriteEvent")
     for data in default_favorite_event_data():
         FavoriteEvent.objects.get_or_create(
@@ -183,6 +249,10 @@ def insert_default_data(sender, **kwargs):
             event=data["event"],
             defaults=data,
         )
+
+    # =====================================================
+    # NOTIFICATIONS
+    # =====================================================
 
     NotificationType = apps.get_model(app_name, "NotificationType")
     for data in default_notification_type_data():
@@ -199,12 +269,20 @@ def insert_default_data(sender, **kwargs):
             defaults=data,
         )
 
+    # =====================================================
+    # REPORTS
+    # =====================================================
+
     Report = apps.get_model(app_name, "Report")
     for data in default_report_data():
         Report.objects.get_or_create(
             title=data["title"],
             defaults=data,
         )
+
+    # =====================================================
+    # EMAIL TOKENS
+    # =====================================================
 
     EmailToken = apps.get_model(app_name, "EmailToken")
     for data in default_email_token_data():

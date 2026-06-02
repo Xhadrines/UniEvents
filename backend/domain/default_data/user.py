@@ -1,8 +1,21 @@
 def default_user_data():
+    """
+    Returnează utilizatorii default utilizați
+    pentru popularea inițială a bazei de date.
+
+    Utilizatorii includ:
+    - administratori,
+    - studenți,
+    - profesori,
+    - organizații,
+    - parteneri,
+    - structuri universitare.
+    """
+
     return [
-        # ==========================================
+        # =====================================================
         # DEFAULT SYSTEM USERS
-        # ==========================================
+        # =====================================================
         {
             "username": "administrator",
             "password": "Admin#1",
@@ -47,9 +60,9 @@ def default_user_data():
             "first_name": "Default",
             "last_name": "Guest",
         },
-        # ==========================================
-        # ORGANIZER USERS
-        # ==========================================
+        # =====================================================
+        # STUDENT ORGANIZATIONS
+        # =====================================================
         {
             "username": "organization_firesc",
             "password": "Organization#1",
@@ -92,62 +105,9 @@ def default_user_data():
             "first_name": "Arcanul",
             "last_name": "Organization",
         },
-        {
-            "username": "organization_tonitza",
-            "password": "Organization#1",
-            "email": "tonitza@usv.ro",
-            "first_name": "Tonitza",
-            "last_name": "Organization",
-        },
-        {
-            "username": "organization_fabulinus",
-            "password": "Organization#1",
-            "email": "fabulinus@usv.ro",
-            "first_name": "Fabulinus",
-            "last_name": "Organization",
-        },
-        {
-            "username": "organization_ccs_usv",
-            "password": "Organization#1",
-            "email": "ccs@usv.ro",
-            "first_name": "CCS",
-            "last_name": "USV",
-        },
-        {
-            "username": "organization_biblioteca_usv",
-            "password": "Organization#1",
-            "email": "biblioteca@usv.ro",
-            "first_name": "Biblioteca",
-            "last_name": "USV",
-        },
-        {
-            "username": "organization_ccoc_usv",
-            "password": "Organization#1",
-            "email": "ccoc@usv.ro",
-            "first_name": "CCOC",
-            "last_name": "USV",
-        },
-        {
-            "username": "organization_radio_usv",
-            "password": "Organization#1",
-            "email": "radio@usv.ro",
-            "first_name": "Radio",
-            "last_name": "USV",
-        },
-        {
-            "username": "organization_dep_calculatoare",
-            "password": "Organization#1",
-            "email": "calculatoare@usv.ro",
-            "first_name": "Departamentul",
-            "last_name": "Calculatoare",
-        },
-        {
-            "username": "organization_dep_electrotehnica",
-            "password": "Organization#1",
-            "email": "electrotehnica@usv.ro",
-            "first_name": "Departamentul",
-            "last_name": "Electrotehnica",
-        },
+        # =====================================================
+        # USV STRUCTURES
+        # =====================================================
         {
             "username": "organization_fiesc",
             "password": "Organization#1",
@@ -183,48 +143,9 @@ def default_user_data():
             "first_name": "FPSE",
             "last_name": "USV",
         },
-        {
-            "username": "organization_silvicultura",
-            "password": "Organization#1",
-            "email": "silvicultura@usv.ro",
-            "first_name": "Silvicultura",
-            "last_name": "USV",
-        },
-        {
-            "username": "organization_fia",
-            "password": "Organization#1",
-            "email": "fia@usv.ro",
-            "first_name": "FIA",
-            "last_name": "USV",
-        },
-        {
-            "username": "organization_fimar",
-            "password": "Organization#1",
-            "email": "fimar@usv.ro",
-            "first_name": "FIMAR",
-            "last_name": "USV",
-        },
-        {
-            "username": "organization_fefs",
-            "password": "Organization#1",
-            "email": "fefs@usv.ro",
-            "first_name": "FEFS",
-            "last_name": "USV",
-        },
-        {
-            "username": "organization_figs",
-            "password": "Organization#1",
-            "email": "figs@usv.ro",
-            "first_name": "FIGS",
-            "last_name": "USV",
-        },
-        {
-            "username": "organization_fmsb",
-            "password": "Organization#1",
-            "email": "fmsb@usv.ro",
-            "first_name": "FMSB",
-            "last_name": "USV",
-        },
+        # =====================================================
+        # EXTERNAL PARTNERS
+        # =====================================================
         {
             "username": "organization_assist",
             "password": "Organization#1",
@@ -247,27 +168,6 @@ def default_user_data():
             "last_name": "Service",
         },
         {
-            "username": "organization_volter",
-            "password": "Organization#1",
-            "email": "office@volter.ro",
-            "first_name": "Volter",
-            "last_name": "Romania",
-        },
-        {
-            "username": "organization_ca_connect",
-            "password": "Organization#1",
-            "email": "contact@caconnect.ro",
-            "first_name": "CA",
-            "last_name": "Connect",
-        },
-        {
-            "username": "organization_schuman",
-            "password": "Organization#1",
-            "email": "contact@schuman.ro",
-            "first_name": "Fundatia",
-            "last_name": "Schuman",
-        },
-        {
             "username": "organization_cj_suceava",
             "password": "Organization#1",
             "email": "contact@cjsuceava.ro",
@@ -280,19 +180,5 @@ def default_user_data():
             "email": "primaria@primariasv.ro",
             "first_name": "Primaria",
             "last_name": "Suceava",
-        },
-        {
-            "username": "organization_teatrul_vasilache",
-            "password": "Organization#1",
-            "email": "contact@teatrulvasilache.ro",
-            "first_name": "Teatrul",
-            "last_name": "Vasilache",
-        },
-        {
-            "username": "organization_evoluat",
-            "password": "Organization#1",
-            "email": "contact@evoluat.ro",
-            "first_name": "Evoluat",
-            "last_name": "Agency",
         },
     ]

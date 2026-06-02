@@ -1,3 +1,9 @@
+# Importăm toate repository-urile într-un singur loc.
+# Astfel, în alte părți ale aplicației putem importa repository-urile
+# direct din acest pachet, fără să mai scriem calea completă către fiecare fișier.
+#
+# Pe scurt: acest fișier face folderul mai ușor de folosit la importuri.
+
 from .base_repository import BaseRepository
 from .category import CategoryRepository
 from .status import StatusRepository

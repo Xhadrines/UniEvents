@@ -1,3 +1,15 @@
+# Importăm toate view-urile aplicației într-un singur loc.
+#
+# Acest fișier funcționează ca un punct central de export.
+# Practic, în loc să importăm fiecare view din fișierul lui separat,
+# le putem importa direct din pachetul views.
+#
+# Exemplu:
+# from api.views import EventView
+#
+# în loc de:
+# from api.views.event import EventView
+
 from .home import HomeView
 from .base_crud import BaseCRUDView
 from .category import CategoryView

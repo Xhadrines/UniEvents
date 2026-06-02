@@ -1,19 +1,50 @@
 def default_notification_type_data():
+    """
+    Returnează lista tipurilor de notificări default
+    utilizate în aplicație.
+
+    Aceste tipuri sunt folosite pentru:
+    - remindere,
+    - confirmări,
+    - actualizări,
+    - anulări de evenimente.
+    """
+
     return [
+        # =====================================================
+        # REMINDER
+        # =====================================================
         {
+            # Tip notificare reminder.
             "name": "Reminder",
-            "description": "Reminder before an event starts.",
+            # Descriere notificare.
+            "description": ("Reminder before an event starts."),
         },
+        # =====================================================
+        # REGISTRATION CONFIRMATION
+        # =====================================================
         {
+            # Confirmare înscriere.
             "name": "Registration Confirmation",
-            "description": "Confirmation after event registration.",
+            # Descriere.
+            "description": ("Confirmation after event registration."),
         },
+        # =====================================================
+        # EVENT UPDATE
+        # =====================================================
         {
+            # Actualizare eveniment.
             "name": "Event Update",
-            "description": "Notification for event changes.",
+            # Descriere notificare.
+            "description": ("Notification for event changes."),
         },
+        # =====================================================
+        # EVENT CANCELLED
+        # =====================================================
         {
+            # Eveniment anulat.
             "name": "Event Cancelled",
-            "description": "Notification for cancelled events.",
+            # Descriere notificare.
+            "description": ("Notification for cancelled events."),
         },
     ]
